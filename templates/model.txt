@@ -1,0 +1,28 @@
+const { DataTypes } = require('sequelize')
+const { database } = require('../database')
+
+const {{className}} = database.define(
+  '{{className}}',
+  {
+    // exemple de champs sur la base
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false
+    },
+    nom: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  },
+  {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+
+    tableName: '' // definir le nom du table
+  }
+)
+
+module.exports = {{className}}

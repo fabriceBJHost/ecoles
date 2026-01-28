@@ -1,0 +1,7 @@
+.menu {
+  text-decoration: none;
+  color: inherit;
+}
+.menuActive {
+  background-color: rgba(128, 128, 128, 0.25);
+}

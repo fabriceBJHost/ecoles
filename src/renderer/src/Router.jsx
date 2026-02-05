@@ -6,6 +6,8 @@ import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import Users from './pages/Users'
 import Classes from './pages/Classes'
+import Etablissements from './pages/Etablissements'
+import Profile from './pages/Profile'
 
 const Router = createHashRouter([
   {
@@ -33,6 +35,14 @@ const Router = createHashRouter([
       {
         path: '/classes',
         element: <Classes />
+      },
+      {
+        path: '/etablissement',
+        element: <Etablissements />
+      },
+      {
+        path: '/profile',
+        element: <Profile />
       }
     ]
   },

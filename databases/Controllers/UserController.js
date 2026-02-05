@@ -1,5 +1,6 @@
 const User = require('../Models/User')
 const { buildSequelizeFilters } = require('../utils/filterHandler')
+const bcrypt = require('bcryptjs')
 
 class UserController {
   /**
@@ -47,6 +48,51 @@ class UserController {
           return { success: false, message: 'Utilisateur non trouver' }
         } else {
           return { success: true, message: 'Utilisateur supprimé avec succès' }
+        }
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    })
+
+    /**
+     * function to update users
+     */
+    IpcMain.handle('updateUsers', async (event, formData) => {
+      try {
+        const { id, school_id, ...data } = formData
+
+        const updated = await User.update(data, { where: { id: id, school_id: school_id } })
+
+        if (updated > 0) {
+          return { success: true, message: "L'utilisateur a été modifier" }
+        } else {
+          return { success: false, message: "Une erreur s'est reproduit" }
+        }
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    })
+
+    /**
+     * function to update password
+     */
+    IpcMain.handle('updatePassword', async (event, formData) => {
+      try {
+        const { id, school_id, password, oldPassword } = formData
+
+        const user = await User.findOne({ where: { id: id, school_id: school_id } })
+        const userPassword = user.dataValues.password
+
+        if (await bcrypt.compare(oldPassword, userPassword)) {
+          const hashedPassword = bcrypt.hashSync(password, 10)
+          const data = {
+            password: hashedPassword
+          }
+          await User.update(data, { where: { id: id, school_id: school_id } })
+
+          return { success: true, message: 'Mot de passe a été modifier avec succès' }
+        } else {
+          return { success: false, message: 'Mot de passe Incorrect' }
         }
       } catch (error) {
         return { success: false, message: error }

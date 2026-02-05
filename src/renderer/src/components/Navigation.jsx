@@ -27,10 +27,10 @@ import {
   FaChevronDown,
   FaBell,
   FaUser,
-  FaUserPlus,
   FaTachometerAlt,
   FaUserFriends,
-  FaUsps
+  FaUsps,
+  FaSchool
 } from 'react-icons/fa'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
@@ -287,7 +287,8 @@ const Navigation = ({ children, setSearchItem }) => {
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               PaperProps={{
                 sx: {
-                  width: 180 // <-- largeur désirée
+                  width: 180, // <-- largeur désirée
+                  color: 'var(--secondary)'
                 }
               }}
             >
@@ -297,14 +298,6 @@ const Navigation = ({ children, setSearchItem }) => {
                   Profile
                 </MenuItem>
               </Link>
-              {/* {userInfo.role === 'admin' && ( */}
-              <Link to={'/register'} className={classe.menu}>
-                <MenuItem onClick={handleMenuClose}>
-                  <FaUserPlus style={{ marginRight: 8 }} />
-                  Nouveau profile
-                </MenuItem>
-              </Link>
-              {/* )} */}
             </Menu>
           </Box>
         </Toolbar>
@@ -371,6 +364,47 @@ const Navigation = ({ children, setSearchItem }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={'Tableau de bord'}
+                  sx={[
+                    {
+                      color: 'var(--primary)'
+                    },
+                    open ? { opacity: 1 } : { opacity: 0 }
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+
+          {/* etablissement */}
+          <Link to={'/etablissement'} className={classe.menu}>
+            <ListItem
+              disablePadding
+              sx={{ display: 'block' }}
+              className={location.pathname == '/etablissement' && classe.menuActive}
+            >
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 32,
+                    px: 2
+                  },
+                  open ? { justifyContent: 'initial' } : { justifyContent: 'center' }
+                ]}
+              >
+                <ListItemIcon
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      fontSize: '1.1rem'
+                    },
+                    open ? { mr: 2 } : { mr: 'auto' }
+                  ]}
+                >
+                  <FaSchool size={20} color="var(--primary)" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={'Etablissement'}
                   sx={[
                     {
                       color: 'var(--primary)'

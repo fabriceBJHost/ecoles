@@ -9,8 +9,11 @@ const ClasseController = require('../../databases/Controllers/ClasseController')
 
 // importation de tous les models
 require('../../databases/Models/School')
+require('../../databases/Models/Role')
+require('../../databases/Models/Annee_Scolaire')
 require('../../databases/Models/User')
 require('../../databases/Models/Classes')
+require('../../databases/Models/Eleve')
 
 let mainWindow
 function createWindow() {

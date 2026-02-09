@@ -5,6 +5,31 @@ CREATE TABLE
     name VARCHAR(150),
     address VARCHAR(300),
     logo VARCHAR(255),
+    option JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+
+-- année scolaires
+CREATE TABLE
+  academic_years (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    school_id BIGINT,
+    name VARCHAR(50), -- ex: 2024-2025
+    start_date DATE,
+    end_date DATE,
+    is_active BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (school_id) REFERENCES schools (id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+
+-- roles
+CREATE TABLE
+  roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE,
+    permission JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
@@ -16,16 +41,14 @@ CREATE TABLE
     school_id BIGINT,
     username VARCHAR(50),
     password VARCHAR(255),
-    role ENUM (
-      'SUPER_ADMIN',
-      'ADMIN',
-      'DIRECTEUR',
-      'SECRETAIRE',
-      'ENSEIGNANT',
-      'COMPTABLE',
-      'SURVEILLANT'
-    ),
+    photos VARCHAR(255),
+    firstname VARCHAR(100),
+    lastname VARCHAR(100),
+    numbers VARCHAR(15),
+    address VARCHAR(300),
+    role_id BIGINT,
     FOREIGN KEY (school_id) REFERENCES schools (id),
+    FOREIGN KEY (role_id) REFERENCES roles (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
@@ -35,9 +58,13 @@ CREATE TABLE
   IF NOT EXISTS classes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     school_id BIGINT,
-    name VARCHAR(50),
-    level VARCHAR(50),
+    academic_year_id BIGINT,
+    name VARCHAR(50), -- "Tle A"
+    level VARCHAR(50), -- terminale
+    capacity INT, -- 60
+    classroom VARCHAR(50), -- salle 10
     FOREIGN KEY (school_id) REFERENCES schools (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
@@ -47,17 +74,29 @@ CREATE TABLE
   IF NOT EXISTS students (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     school_id BIGINT,
-    class_id BIGINT,
+    academic_year_id BIGINT,
     firstname VARCHAR(100),
     lastname VARCHAR(100),
     photos TEXT DEFAULT NULL,
     address VARCHAR(300),
     birthdate DATE,
     status ENUM ('ACTIF', 'RENVOYE', 'DIPLOME'),
-    FOREIGN KEY (class_id) REFERENCES classes (id),
     FOREIGN KEY (school_id) REFERENCES schools (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+
+CREATE TABLE
+  enrollments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    student_id BIGINT,
+    class_id BIGINT,
+    academic_year_id BIGINT,
+    status ENUM ('INSCRIT', 'REDOUBLANT', 'TRANSFERE'),
+    FOREIGN KEY (student_id) REFERENCES students (id),
+    FOREIGN KEY (class_id) REFERENCES classes (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
   );
 
 -- matières
@@ -66,21 +105,7 @@ CREATE TABLE
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     school_id BIGINT,
     name VARCHAR(100),
-    coefficient INT,
-    FOREIGN KEY (school_id) REFERENCES schools (id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  );
-
--- enseignants
-CREATE TABLE
-  IF NOT EXISTS teachers (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    school_id BIGINT,
-    firstname VARCHAR(100),
-    lastname VARCHAR(100),
-    numbers VARCHAR(15),
-    address VARCHAR(300),
+    coefficient FLOAT,
     FOREIGN KEY (school_id) REFERENCES schools (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -107,8 +132,7 @@ CREATE TABLE
     FOREIGN KEY (school_id) REFERENCES schools (id),
     FOREIGN KEY (class_id) REFERENCES classes (id),
     FOREIGN KEY (subject_id) REFERENCES subjects (id),
-    FOREIGN KEY (teacher_id) REFERENCES teachers (id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users (id) created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
 
@@ -119,11 +143,13 @@ CREATE TABLE
     school_id BIGINT,
     student_id BIGINT,
     subject_id BIGINT,
+    academic_year_id BIGINT,
     value FLOAT,
     term ENUM ('TRIMESTRE1', 'TRIMESTRE2', 'TRIMESTRE3'),
     FOREIGN KEY (school_id) REFERENCES schools (id),
     FOREIGN KEY (student_id) REFERENCES students (id),
     FOREIGN KEY (subject_id) REFERENCES subjects (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
@@ -134,12 +160,14 @@ CREATE TABLE
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     school_id BIGINT,
     student_id BIGINT,
-    term VARCHAR(20),
+    academic_year_id BIGINT,
+    term ENUM ('TRIMESTRE1', 'TRIMESTRE2', 'TRIMESTRE3'),
     average FLOAT,
     rank INT,
     decision ENUM ('ADMIS', 'REDOUBLE', 'RENVOYE'),
     FOREIGN KEY (school_id) REFERENCES schools (id),
     FOREIGN KEY (student_id) REFERENCES students (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
@@ -150,11 +178,14 @@ CREATE TABLE
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     school_id BIGINT,
     student_id BIGINT,
+    academic_year_id BIGINT,
     amount FLOAT,
     payment_date DATE,
+    receipt_number VARCHAR(100),
     type ENUM ('INSCRIPTION', 'ECOLAGE'),
     FOREIGN KEY (school_id) REFERENCES schools (id),
     FOREIGN KEY (student_id) REFERENCES students (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );

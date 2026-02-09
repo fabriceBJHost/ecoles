@@ -30,7 +30,8 @@ import {
   FaTachometerAlt,
   FaUserFriends,
   FaUsps,
-  FaSchool
+  FaSchool,
+  FaUserGraduate
 } from 'react-icons/fa'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
@@ -490,6 +491,48 @@ const Navigation = ({ children, setSearchItem }) => {
                   sx={[
                     {
                       color: 'var(--primary)'
+                    },
+                    open ? { opacity: 1 } : { opacity: 0 }
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+
+          {/* eleves */}
+          <Link to={'/eleves'} className={classe.menu}>
+            <ListItem
+              disablePadding
+              sx={{ display: 'block' }}
+              className={location.pathname == '/eleves' && classe.menuActive}
+            >
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 32,
+                    px: 2
+                  },
+                  open ? { justifyContent: 'initial' } : { justifyContent: 'center' }
+                ]}
+              >
+                <ListItemIcon
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      fontSize: '1.1rem'
+                    },
+                    open ? { mr: 2 } : { mr: 'auto' }
+                  ]}
+                >
+                  <FaUserGraduate size={20} color="var(--primary)" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={'élèves'}
+                  sx={[
+                    {
+                      color: 'var(--primary)',
+                      textTransform: 'capitalize'
                     },
                     open ? { opacity: 1 } : { opacity: 0 }
                   ]}

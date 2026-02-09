@@ -3,8 +3,8 @@ const { database } = require('../database')
 const School = require('./School')
 const Annee_Scolaire = require('./Annee_Scolaire')
 
-const Classes = database.define(
-  'Classes',
+const Eleve = database.define(
+  'Eleve',
   {
     // exemple de champs sur la base
     id: {
@@ -27,20 +27,28 @@ const Classes = database.define(
         key: 'id'
       }
     },
-    name: {
-      type: DataTypes.STRING(50),
+    firstname: {
+      type: DataTypes.STRING(250),
       allowNull: false
     },
-    level: {
-      type: DataTypes.STRING(100),
+    lastname: {
+      type: DataTypes.STRING(250),
       allowNull: false
     },
-    capacity: {
-      type: DataTypes.INTEGER,
+    photos: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    address: {
+      type: DataTypes.STRING(400),
       allowNull: false
     },
-    classroom: {
-      type: DataTypes.STRING(100),
+    birthdate: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('ACTIF', 'RENVOYE', 'DIPLOME'),
       allowNull: false
     }
   },
@@ -49,13 +57,12 @@ const Classes = database.define(
     createdAt: 'created_at',
     updatedAt: 'updated_at',
 
-    tableName: 'classes' // definir le nom du table
+    tableName: 'eleves' // definir le nom du table
   }
 )
+School.hasMany(Eleve, { foreignKey: 'school_id' })
+Eleve.belongsTo(School, { foreignKey: 'school_id' })
+Eleve.belongsTo(Annee_Scolaire, { foreignKey: 'academic_year_id' })
+Annee_Scolaire.hasMany(Eleve, { foreignKey: 'academic_year_id' })
 
-School.hasMany(Classes, { foreignKey: 'school_id' })
-Classes.belongsTo(School, { foreignKey: 'school_id' })
-Annee_Scolaire.hasMany(Classes, { foreignKey: 'academic_year_id' })
-Classes.belongsTo(Annee_Scolaire, { foreignKey: 'academic_year_id' })
-
-module.exports = Classes
+module.exports = Eleve

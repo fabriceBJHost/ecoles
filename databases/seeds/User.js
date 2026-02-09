@@ -16,7 +16,7 @@ const seedUser = async () => {
     // (Bcrypt est lent, le faire 400 fois dans une boucle bloquera le script)
     const hashedDefaultPassword = bcrypt.hashSync('password123', 10)
 
-    while (usersToCreate.length < 400) {
+    while (usersToCreate.length < 600) {
       const firstName = faker.person.firstName()
       const lastName = faker.person.lastName()
 

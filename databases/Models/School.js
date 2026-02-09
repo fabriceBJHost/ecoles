@@ -20,12 +20,27 @@ const School = database.define(
       type: DataTypes.STRING(300),
       unique: true
     },
-    number: {
+    number1: {
       type: DataTypes.STRING(15),
       unique: true
     },
+    number2: {
+      type: DataTypes.STRING(15),
+      unique: true,
+      allowNull: true
+    },
     logo: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      default: null
+    },
+    option: {
+      type: DataTypes.JSON,
+      defaultValue: {
+        baremeNotation: 20,
+        roundMoyenne: 2,
+        activeCoefperpatiere: 1,
+        AficheRangBulletin: 0
+      }
     }
   },
   {

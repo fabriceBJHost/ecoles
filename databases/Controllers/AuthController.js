@@ -8,6 +8,9 @@ class AuthController {
    * @param {Electron.IpcMain} IpcMain
    */
   userHandler = (IpcMain) => {
+    /**
+     * function to log in
+     */
     IpcMain.handle('login', async (event, formData) => {
       try {
         const { username, password } = formData

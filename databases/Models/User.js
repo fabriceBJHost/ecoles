@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize')
 const { database } = require('../database')
 const School = require('./School')
+const Role = require('./Role')
 
 const User = database.define(
   'User',
@@ -28,12 +29,36 @@ const User = database.define(
       type: DataTypes.TEXT,
       allowNull: false
     },
-    role: {
-      type: DataTypes.ENUM('DIRECTEUR', 'SECRETAIRE', 'ENSEIGNANT', 'SURVEILLANT')
+    role_id: {
+      type: DataTypes.BIGINT,
+      references: {
+        model: Role,
+        key: 'id'
+      }
     },
     photo: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    firstname: {
+      type: DataTypes.STRING(250),
+      allowNull: false
+    },
+    lastname: {
+      type: DataTypes.STRING(250),
+      allowNull: false
+    },
+    numbers1: {
+      type: DataTypes.STRING(15),
+      allowNull: false
+    },
+    numbers2: {
+      type: DataTypes.STRING(15),
+      allowNull: true
+    },
+    address: {
+      type: DataTypes.STRING(300),
+      allowNull: false
     }
   },
   {
@@ -47,5 +72,7 @@ const User = database.define(
 
 School.hasMany(User, { foreignKey: 'school_id' })
 User.belongsTo(School, { foreignKey: 'school_id' })
+Role.hasMany(User, { foreignKey: 'role_id' })
+User.belongsTo(Role, { foreignKey: 'role_id' })
 
 module.exports = User

@@ -20,13 +20,15 @@ const seedSchool = async () => {
       schoolsToCreate.push({
         name: schoolName,
         address: `${faker.location.streetAddress()}, ${faker.location.city()}`,
+        number1: faker.phone.number({ style: 'national' }).replace(/\s/g, '').substring(0, 15),
+        number2: faker.phone.number({ style: 'national' }).replace(/\s/g, '').substring(0, 15),
         logo: faker.image.url({ category: 'education', width: 200, height: 200 })
         // created_at et updated_at sont gérés automatiquement par database si timestamps: true
       })
     }
 
     // Insertion massive (Bulk Create)
-    await School.bulkCreate(schoolsToCreate)
+    await School.bulkCreate(schoolsToCreate, { validate: true })
 
     console.log('✅ 20 écoles ont été générées avec succès !')
     process.exit() // Quitter le script

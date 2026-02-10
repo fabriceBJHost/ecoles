@@ -28,6 +28,7 @@ import { appTheme } from '../utils/theme'
 import { Alert, Confirm } from '../utils/Alert'
 import { deleteUsers } from '../utils/Request'
 import { formatPhoneNumber } from '../utils/Function'
+import UserDetailsModal from '../components/UserDetailsModal'
 
 const Users = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
@@ -109,7 +110,7 @@ const Users = () => {
           alignItems={'center'}
           justifyContent={'center'}
         >
-          <IconButton title="Voir plus de détail">
+          <IconButton title="Voir plus de détail" onClick={onOpenSingle}>
             <FaEye size={18} />
           </IconButton>
           <IconButton title="Modifier">
@@ -192,8 +193,13 @@ const Users = () => {
       deleteMutation.mutate({ id: id, school_id: schoolId })
     }
   }
+
+  const [openSingle, setOpenSingle] = useState(false)
+  const onCloseSIngle = () => setOpenSingle(false)
+  const onOpenSingle = () => setOpenSingle(true)
   return (
     <Container disableGutters>
+      <UserDetailsModal handleClose={onCloseSIngle} open={openSingle} />
       <Grid spacing={2} container>
         <Grid size={{ lg: 6, md: 7, sm: 7 }}>
           <Stack

@@ -49,20 +49,41 @@ class UserController {
     })
 
     /**
+     * function to get one users
+     */
+    IpcMain.handle('getOneUsers', async (event, formData) => {
+      try {
+        const { id, school_id } = formData
+        const users = await User.findOne({
+          where: { id: id, school_id: school_id },
+          include: [{ model: Role, required: false }]
+        })
+
+        return { success: true, data: users.dataValues }
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    })
+
+    /**
      * function to delete users
      */
     IpcMain.handle('deleteUsers', async (event, formData) => {
       try {
-        const { id, school_id } = formData
+        const { id, school_id, current_user_id } = formData
+
+        if (id === current_user_id) {
+          return { success: false, message: 'Vous ne pouvez pas supprimer votre propre compte.' }
+        }
 
         const deleted = await User.destroy({
           where: { id: id, school_id: school_id }
         })
 
-        if (!deleted) {
+        if (deleted === 0) {
           return { success: false, message: 'Utilisateur non trouver' }
         } else {
-          return { success: true, message: 'Utilisateur supprimé avec succès' }
+          return { success: true, message: "L'utilisateur a été supprimé définitivement" }
         }
       } catch (error) {
         return { success: false, message: error }
@@ -70,16 +91,16 @@ class UserController {
     })
 
     /**
-     * function to update users
+     * function to update users Info
      */
     IpcMain.handle('updateUsers', async (event, formData) => {
       try {
         const { id, school_id, ...data } = formData
 
-        const updated = await User.update(data, { where: { id: id, school_id: school_id } })
+        const [rowsAffected] = await User.update(data, { where: { id: id, school_id: school_id } })
 
-        if (updated > 0) {
-          return { success: true, message: "L'utilisateur a été modifier" }
+        if (rowsAffected > 0) {
+          return { success: true, message: "L'utilisateur a été modifié avec succès" }
         } else {
           return { success: false, message: "Une erreur s'est reproduit" }
         }

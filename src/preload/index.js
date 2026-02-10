@@ -20,6 +20,7 @@ if (process.contextIsolated) {
      */
     contextBridge.exposeInMainWorld('users', {
       getUsers: (formData) => ipcRenderer.invoke('getLocalUsers', formData),
+      getOneUsers: (formData) => ipcRenderer.invoke('getOneUsers', formData),
       deleteUsers: (formData) => ipcRenderer.invoke('deleteUsers', formData),
       updateUsers: (formData) => ipcRenderer.invoke('updateUsers', formData),
       updatePassword: (formData) => ipcRenderer.invoke('updatePassword', formData)

@@ -1,3 +1,4 @@
+const Role = require('../Models/Role')
 const School = require('../Models/School')
 const User = require('../Models/User')
 const bcrypt = require('bcryptjs')
@@ -19,27 +20,27 @@ class AuthController {
           include: [
             {
               model: School
+            },
+            {
+              model: Role
             }
           ]
         })
 
         if (!user) {
-          return { success: false, message: 'Utilisateur non trouvé' }
+          return { success: false, message: 'Utilisateur introuvable' }
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password)
 
         if (isPasswordValid) {
           // Retournez les données utiles (évitez de renvoyer le hash du mot de passe)
+          const userToSend = user.dataValues
+          delete userToSend.password
+
           return {
             success: true,
-            user: {
-              id: user.id,
-              username: user.username,
-              role: user.role,
-              photo: user.photo,
-              school: user.School.dataValues
-            }
+            userToSend
           }
         } else {
           return { success: false, message: 'Mot de passe incorrect' }

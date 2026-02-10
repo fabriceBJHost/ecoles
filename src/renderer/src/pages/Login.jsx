@@ -35,8 +35,8 @@ const Login = () => {
       Alert('Erreur', response.message, 'error', 'OK', 'var(--primary)')
     } else {
       Alert('Connecté', 'Connection réussi', 'success', 'OK', 'var(--primary)')
-      setUser(JSON.stringify(response.user))
-      setToken(JSON.stringify(response.user))
+      setUser(JSON.stringify(response.userToSend))
+      setToken(JSON.stringify(response.userToSend))
     }
   }
 

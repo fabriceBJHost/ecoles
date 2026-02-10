@@ -11,7 +11,12 @@ const buildSequelizeFilters = (muiFilters, quickFilter, searchableColumns = []) 
   if (!muiFilters || !Array.isArray(muiFilters)) return where
 
   muiFilters.forEach((filter) => {
-    const { field, operator, value } = filter
+    let { field, operator, value } = filter
+
+    // 1. Correction pour le rôle
+    if (field === 'Role.nom') {
+      field = '$Role.nom$'
+    }
 
     // On ignore les filtres qui n'ont pas de valeur (sauf pour "vide" / "pas vide")
     const hasNoValue = value === undefined || value === null || value === ''
@@ -55,9 +60,19 @@ const buildSequelizeFilters = (muiFilters, quickFilter, searchableColumns = []) 
 
   // 2. Gestion de la recherche globale (Quick Filter)
   if (quickFilter && searchableColumns.length > 0) {
-    where[Op.or] = searchableColumns.map((col) => ({
-      [col]: { [Op.like]: `%${quickFilter}%` }
-    }))
+    where[Op.or] = searchableColumns.map((col) => {
+      let finalColumn = col
+
+      // Si la colonne contient un point (ex: Role.nom),
+      // on la transforme en syntaxe de jointure Sequelize
+      if (col.includes('.')) {
+        finalColumn = `$${col}$`
+      }
+
+      return {
+        [finalColumn]: { [Op.like]: `%${quickFilter}%` }
+      }
+    })
   }
 
   return where

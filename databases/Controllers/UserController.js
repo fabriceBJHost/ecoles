@@ -1,3 +1,4 @@
+const Role = require('../Models/Role')
 const User = require('../Models/User')
 const { buildSequelizeFilters } = require('../utils/filterHandler')
 const bcrypt = require('bcryptjs')
@@ -15,7 +16,14 @@ class UserController {
       try {
         const { school_id, page, pageSize, filters, quickFilter } = formData
         const offset = page * pageSize
-        const columnsToSearch = ['username', 'role']
+        const columnsToSearch = [
+          'username',
+          'firstname',
+          'lastname',
+          'numbers1',
+          'address',
+          'Role.nom'
+        ]
         // Construction dynamique du filtre
         const dynamicFilters = buildSequelizeFilters(filters, quickFilter, columnsToSearch)
         let whereClause = { school_id: school_id, ...dynamicFilters }
@@ -24,7 +32,14 @@ class UserController {
           where: whereClause,
           limit: pageSize,
           offset: offset,
-          raw: true
+          raw: true,
+          include: [
+            {
+              model: Role,
+              required: false
+            }
+          ],
+          subQuery: false
         })
 
         return { success: true, data: result.rows, count: result.count }

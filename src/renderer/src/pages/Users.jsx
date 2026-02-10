@@ -13,6 +13,7 @@ import {
 import { DataGrid } from '@mui/x-data-grid'
 import {
   FaEdit,
+  FaEye,
   FaPlusCircle,
   FaRegFileExcel,
   FaRegUserCircle,
@@ -26,10 +27,12 @@ import { ThemeProvider } from '@mui/material/styles'
 import { appTheme } from '../utils/theme'
 import { Alert, Confirm } from '../utils/Alert'
 import { deleteUsers } from '../utils/Request'
+import { formatPhoneNumber } from '../utils/Function'
 
 const Users = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
-  let schoolInfo = userInfo.school
+  let schoolInfo = userInfo.School.dataValues
+
   const schoolId = schoolInfo.id
   const column = [
     {
@@ -37,7 +40,7 @@ const Users = () => {
       headerName: '',
       headerAlign: 'center',
       align: 'center',
-      width: 80,
+      width: 50,
       sortable: false,
       renderCell: (params) => (
         <Avatar
@@ -53,15 +56,43 @@ const Users = () => {
       field: 'username',
       headerName: "Nom d'utilisateur",
       headerAlign: 'center',
-      // align: 'center',
+      minWidth: 150,
       flex: 1
     },
     {
-      field: 'role',
+      field: 'firstname',
+      headerName: 'Nom',
+      headerAlign: 'center',
+      align: 'left',
+      width: 120
+    },
+    {
+      field: 'lastname',
+      headerName: 'Prénom',
+      headerAlign: 'center',
+      align: 'left',
+      width: 100
+    },
+    {
+      field: 'numbers1',
+      headerName: 'Téléphone',
+      headerAlign: 'center',
+      align: 'left',
+      width: 150
+    },
+    {
+      field: 'address',
+      headerName: 'Adresse',
+      headerAlign: 'center',
+      minWidth: 150,
+      flex: 1
+    },
+    {
+      field: 'Role.nom',
       headerName: 'Rôles',
       headerAlign: 'center',
-      align: 'center',
-      flex: 1
+      align: 'right',
+      width: 130
     },
     {
       field: 'action',
@@ -71,7 +102,16 @@ const Users = () => {
       width: 150,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction={'row'} spacing={1} id={params.row.id} alignItems={'center'}>
+        <Stack
+          direction={'row'}
+          spacing={1}
+          id={params.row.id}
+          alignItems={'center'}
+          justifyContent={'center'}
+        >
+          <IconButton title="Voir plus de détail">
+            <FaEye size={18} />
+          </IconButton>
           <IconButton title="Modifier">
             <FaEdit size={18} />
           </IconButton>
@@ -115,8 +155,12 @@ const Users = () => {
   const row = useMemo(() => {
     return dataItem.map((item) => ({
       id: item.id,
-      role: item.role,
+      'Role.nom': item['Role.nom'],
       username: item.username,
+      firstname: item.firstname,
+      lastname: item.lastname,
+      numbers1: formatPhoneNumber(item.numbers1),
+      address: item.address,
       photos: item.photo
     }))
   }, [dataItem])
@@ -140,7 +184,8 @@ const Users = () => {
       'Voulez vous supprimé cette utilisateur ?',
       'warning',
       'Oui',
-      'var(--primary)'
+      'var(--primary)',
+      'Non'
     )
 
     if (confirm) {

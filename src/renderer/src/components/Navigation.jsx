@@ -37,6 +37,8 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import classe from '../assets/Navigation.module.css'
+import { RiLogoutBoxRLine } from 'react-icons/ri'
+import { useAuthContext } from '../contexts/AuthContext'
 
 const drawerWidth = 200
 
@@ -166,6 +168,7 @@ const Navigation = ({ children, setSearchItem }) => {
   const navigate = useNavigate()
   const user = localStorage.getItem('user')
   const userInfo = JSON.parse(user)
+  const { setUser, setToken } = useAuthContext()
 
   const handleDrawerOpen = () => {
     setOpen(true)
@@ -173,6 +176,11 @@ const Navigation = ({ children, setSearchItem }) => {
 
   const handleDrawerClose = () => {
     setOpen(false)
+  }
+
+  const logout = () => {
+    setToken(null)
+    setUser(null)
   }
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -297,6 +305,10 @@ const Navigation = ({ children, setSearchItem }) => {
                 <MenuItem onClick={handleMenuClose}>
                   <FaUser style={{ marginRight: 8 }} />
                   Profile
+                </MenuItem>
+                <MenuItem onClick={logout}>
+                  <RiLogoutBoxRLine style={{ marginRight: 8 }} />
+                  Déconnection
                 </MenuItem>
               </Link>
             </Menu>

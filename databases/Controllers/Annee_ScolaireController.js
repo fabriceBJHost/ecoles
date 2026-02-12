@@ -57,7 +57,8 @@ class Annee_ScolaireController {
         const { school_id } = formData
 
         const result = await Annee_Scolaire.findAll({
-          where: { school_id: school_id }
+          where: { school_id: school_id },
+          raw: true
         })
 
         return { success: true, data: result }

@@ -18,6 +18,10 @@ const buildSequelizeFilters = (muiFilters, quickFilter, searchableColumns = []) 
       field = '$Role.nom$'
     }
 
+    if (field === 'academic_year_id') {
+      field = '$Annee_Scolaire.name$'
+    }
+
     // On ignore les filtres qui n'ont pas de valeur (sauf pour "vide" / "pas vide")
     const hasNoValue = value === undefined || value === null || value === ''
     const isCheckEmpty = ['isEmpty', 'isNotEmpty'].includes(operator)

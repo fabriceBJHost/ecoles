@@ -66,7 +66,7 @@ class ClasseController {
           where: { id: id, school_id: school_id }
         })
 
-        if (!deleted) {
+        if (deleted === 0) {
           return { success: false, message: 'Classe non trouver' }
         } else {
           return { success: true, message: 'Classe supprimé avec succès' }
@@ -83,9 +83,11 @@ class ClasseController {
       try {
         const { id, school_id, ...data } = formData
 
-        const updated = await Classes.update(data, { where: { id: id, school_id: school_id } })
+        const [rowsAffected] = await Classes.update(data, {
+          where: { id: id, school_id: school_id }
+        })
 
-        if (updated > 0) {
+        if (rowsAffected > 0) {
           return { success: true, message: 'Classe a été modifier' }
         } else {
           return { success: false, message: "Une erreur s'est reproduit" }

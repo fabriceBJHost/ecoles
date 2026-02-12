@@ -65,6 +65,7 @@ const UpdateAnneeScolaire = ({ open, handleClose, school_id, id }) => {
         Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
         handleClose(true)
         queryclient.invalidateQueries({ queryKey: ['anneeScolaire'] })
+        queryclient.invalidateQueries({ queryKey: ['listAnneeScolaire'] })
         setFormData((prev) => ({
           ...prev,
           name: '',

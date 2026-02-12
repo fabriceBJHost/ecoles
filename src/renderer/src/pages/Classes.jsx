@@ -112,7 +112,7 @@ const Classes = () => {
   const row = useMemo(() => {
     return dataItem.map((item) => ({
       id: item.id,
-      academic_year_id: item.id,
+      academic_year_id: item['Annee_Scolaire.name'],
       name: item.name,
       level: item.level,
       capacity: item.capacity,

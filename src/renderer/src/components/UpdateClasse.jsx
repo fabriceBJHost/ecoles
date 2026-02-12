@@ -1,4 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/display-name */
+/* eslint-disable react/prop-types */
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -9,9 +13,9 @@ import {
   TextField
 } from '@mui/material'
 import PropTypes from 'prop-types'
-import { useEffect, useState } from 'react'
-import { FaRegEdit, FaTeeth } from 'react-icons/fa'
-import { getClasseByPk, updateClasse } from '../utils/Request'
+import { memo, useEffect, useMemo, useState } from 'react'
+import { FaCalendar, FaCaretUp, FaRegEdit, FaTeeth } from 'react-icons/fa'
+import { getAnneeScolaireList, getClasseByPk, updateClasse } from '../utils/Request'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Alert } from '../utils/Alert'
 
@@ -20,7 +24,10 @@ const UpdateClasse = ({ open, handleClose, school_id, id }) => {
     id: '',
     name: '',
     level: '',
-    school_id: school_id
+    school_id: school_id,
+    academic_year_id: '',
+    capacity: '',
+    classroom: ''
   })
 
   const { data } = useQuery({
@@ -29,7 +36,33 @@ const UpdateClasse = ({ open, handleClose, school_id, id }) => {
     enabled: !!id
   })
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const { data: Scolaire = [] } = useQuery({
+    queryKey: ['listAnneeScolaire'],
+    queryFn: () => getAnneeScolaireList({ school_id })
+  })
+
+  const anneeItems = Scolaire.data ?? []
+
+  const selectedAcademicYears = useMemo(
+    () => anneeItems.find((item) => item.id === formData.academic_year_id) || null,
+    [anneeItems, formData.academic_year_id]
+  )
+
+  const filteredMembers = useMemo(() => {
+    return (options, params) => {
+      const input = params.inputValue.toLowerCase()
+      return options.filter((option) => {
+        return option.name?.toLowerCase().includes(input)
+      })
+    }
+  }, [])
+
+  const RenderMemberOption = memo(({ props, option }) => (
+    <li {...props} key={option.id}>
+      {option.name}
+    </li>
+  ))
+
   const classe = data?.data ?? {}
 
   useEffect(() => {
@@ -39,7 +72,10 @@ const UpdateClasse = ({ open, handleClose, school_id, id }) => {
         id: classe.id,
         name: classe.name,
         level: classe.level,
-        school_id: classe.school_id
+        school_id: classe.school_id,
+        academic_year_id: classe.academic_year_id,
+        capacity: classe.capacity,
+        classroom: classe.classroom
       }))
     }
   }, [classe])
@@ -96,7 +132,7 @@ const UpdateClasse = ({ open, handleClose, school_id, id }) => {
           fontWeight: 'bold'
         }}
       >
-        Ajouter un nouveau Classe
+        Modifier une Classe
       </DialogTitle>
       <DialogContent
         dividers={true}
@@ -173,6 +209,127 @@ const UpdateClasse = ({ open, handleClose, school_id, id }) => {
                   }
                 }
               }}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              label="Capaciter"
+              size="small"
+              fullWidth
+              margin="dense"
+              name="capacity"
+              type="number"
+              required
+              placeholder="Capaciter de la salle"
+              value={formData.capacity}
+              onChange={handleChange}
+              color="black"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaCaretUp color="var(--secondary)" />
+                    </InputAdornment>
+                  )
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'var(--secondary)'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'var(--secondary)'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'var(--primary)'
+                  }
+                }
+              }}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              label="Salle N°"
+              size="small"
+              fullWidth
+              margin="dense"
+              name="classroom"
+              type="number"
+              required
+              placeholder="Numéro de la salle"
+              value={formData.classroom}
+              onChange={handleChange}
+              color="black"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaCaretUp color="var(--secondary)" />
+                    </InputAdornment>
+                  )
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'var(--secondary)'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'var(--secondary)'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'var(--primary)'
+                  }
+                }
+              }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Autocomplete
+              options={anneeItems}
+              value={selectedAcademicYears}
+              getOptionLabel={(option) => option.name || ''}
+              filterOptions={filteredMembers}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  academic_year_id: newValue ? newValue.id : ''
+                }))
+              }}
+              renderOption={(props, option) => <RenderMemberOption props={props} option={option} />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  color="black"
+                  label="Sélectionner une année scolaire"
+                  placeholder="Choisir une année scolaire"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: 'var(--secondary)'
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'var(--secondary)'
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'var(--primary)'
+                      }
+                    }
+                  }}
+                  margin="dense"
+                  required
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FaCalendar color="var(--secondary)" />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              )}
             />
           </Grid>
         </Grid>

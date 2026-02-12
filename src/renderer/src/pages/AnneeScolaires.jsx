@@ -128,6 +128,7 @@ const AnneeScolaires = ({ school_id }) => {
         Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
       } else {
         queryclient.invalidateQueries({ queryKey: ['anneeScolaire'] })
+        queryclient.invalidateQueries({ queryKey: ['listAnneeScolaire'] })
         Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
       }
     },

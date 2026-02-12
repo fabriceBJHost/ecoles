@@ -1,4 +1,8 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/display-name */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -9,10 +13,10 @@ import {
   TextField
 } from '@mui/material'
 import PropTypes from 'prop-types'
-import { useState } from 'react'
-import { FaCaretUp, FaPlusCircle, FaTeeth } from 'react-icons/fa'
-import { createClasse } from '../utils/Request'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { memo, useMemo, useState } from 'react'
+import { FaCalendar, FaCaretUp, FaPlusCircle, FaTeeth } from 'react-icons/fa'
+import { createClasse, getAnneeScolaireList } from '../utils/Request'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Alert } from '../utils/Alert'
 
 const AddClasse = ({ open, handleClose, school_id }) => {
@@ -24,6 +28,33 @@ const AddClasse = ({ open, handleClose, school_id }) => {
     classroom: '',
     school_id: school_id
   })
+
+  const { data: Scolaire = [] } = useQuery({
+    queryKey: ['listAnneeScolaire'],
+    queryFn: () => getAnneeScolaireList({ school_id })
+  })
+
+  const anneeItems = Scolaire.data ?? []
+
+  const selectedAcademicYears = useMemo(
+    () => anneeItems.find((item) => item.id === formData.academic_year_id) || null,
+    [anneeItems, formData.academic_year_id]
+  )
+
+  const filteredMembers = useMemo(() => {
+    return (options, params) => {
+      const input = params.inputValue.toLowerCase()
+      return options.filter((option) => {
+        return option.name?.toLowerCase().includes(input)
+      })
+    }
+  }, [])
+
+  const RenderMemberOption = memo(({ props, option }) => (
+    <li {...props} key={option.id}>
+      {option.name}
+    </li>
+  ))
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -45,7 +76,10 @@ const AddClasse = ({ open, handleClose, school_id }) => {
           ...prev,
           name: '',
           level: '',
-          school_id: school_id
+          school_id: school_id,
+          academic_year_id: '',
+          capacity: '',
+          classroom: ''
         }))
       }
     },
@@ -228,6 +262,53 @@ const AddClasse = ({ open, handleClose, school_id }) => {
                   }
                 }
               }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Autocomplete
+              options={anneeItems}
+              value={selectedAcademicYears}
+              getOptionLabel={(option) => option.name || ''}
+              filterOptions={filteredMembers}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  academic_year_id: newValue ? newValue.id : ''
+                }))
+              }}
+              renderOption={(props, option) => <RenderMemberOption props={props} option={option} />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  color="black"
+                  label="Sélectionner une année scolaire"
+                  placeholder="Choisir une année scolaire"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: 'var(--secondary)'
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'var(--secondary)'
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'var(--primary)'
+                      }
+                    }
+                  }}
+                  margin="dense"
+                  required
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FaCalendar color="var(--secondary)" />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              )}
             />
           </Grid>
         </Grid>

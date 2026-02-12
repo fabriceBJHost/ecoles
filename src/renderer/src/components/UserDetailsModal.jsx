@@ -12,6 +12,7 @@ import {
   Stack,
   Paper
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import {
   FaTimes as CloseIcon,
   FaPhoneAlt as PhoneIcon,
@@ -19,21 +20,18 @@ import {
   FaUser as AccountCircleIcon
 } from 'react-icons/fa'
 import { FaLocationDot as LocationOnIcon } from 'react-icons/fa6'
+import { getOneUser } from '../utils/Request'
+import { formatPhoneNumber } from '../utils/Function'
 
-// Simulation d'une donnée statique basée sur ton modèle
-const staticUser = {
-  firstname: 'Jean',
-  lastname: 'Dupont',
-  username: 'j.dupont2024',
-  role_name: 'DIRECTEUR', // Vient de la jointure Role
-  photo: 'https://i.pravatar.cc/300',
-  numbers1: '+261 34 00 000 00',
-  numbers2: '032 11 222 33',
-  address: "123 Rue de l'École, Antananarivo, Madagascar",
-  created_at: '2024-02-10T10:00:00Z'
-}
+const UserDetailsModal = ({ open, handleClose, id, school_id }) => {
+  const { data: userInfo = {} } = useQuery({
+    queryKey: ['UserSingles', id],
+    queryFn: () => getOneUser({ id, school_id }),
+    enabled: !!id
+  })
 
-const UserDetailsModal = ({ open, handleClose }) => {
+  const data = userInfo.data || {}
+
   return (
     <Dialog
       open={open}
@@ -56,7 +54,7 @@ const UserDetailsModal = ({ open, handleClose }) => {
         {/* EN-TÊTE : Photo et Identité */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3, mt: 2 }}>
           <Avatar
-            src={staticUser.photo}
+            src={data.photo}
             sx={{
               width: 120,
               height: 120,
@@ -67,10 +65,10 @@ const UserDetailsModal = ({ open, handleClose }) => {
             }}
           />
           <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: 'var(--primary)' }}>
-            {staticUser.firstname} {staticUser.lastname}
+            {data.firstname} {data.lastname}
           </Typography>
           <Chip
-            label={staticUser.role_name}
+            label={data.Role?.dataValues.nom || ''}
             variant="outlined"
             size="small"
             sx={{
@@ -99,12 +97,12 @@ const UserDetailsModal = ({ open, handleClose }) => {
                 <DetailItem
                   icon={<AccountCircleIcon color="var(--secondary)" />}
                   label="Nom d'utilisateur"
-                  value={staticUser.username}
+                  value={data.username}
                 />
                 <DetailItem
                   icon={<BadgeIcon color="var(--secondary)" />}
                   label="ID Employé"
-                  value="#12345"
+                  value={`#${data.id}`}
                 />
               </Stack>
             </Paper>
@@ -123,19 +121,19 @@ const UserDetailsModal = ({ open, handleClose }) => {
                 <DetailItem
                   icon={<PhoneIcon color="var(--secondary)" />}
                   label="Téléphone principal"
-                  value={staticUser.numbers1}
+                  value={formatPhoneNumber(data.numbers1)}
                 />
-                {staticUser.numbers2 && (
+                {data.numbers2 && (
                   <DetailItem
                     icon={<PhoneIcon color="var(--secondary)" />}
                     label="Téléphone secondaire"
-                    value={staticUser.numbers2}
+                    value={formatPhoneNumber(data.numbers2)}
                   />
                 )}
                 <DetailItem
                   icon={<LocationOnIcon color="var(--secondary)" />}
                   label="Adresse"
-                  value={staticUser.address}
+                  value={data.address}
                 />
               </Stack>
             </Paper>

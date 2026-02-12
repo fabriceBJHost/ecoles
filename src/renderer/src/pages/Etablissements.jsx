@@ -16,17 +16,15 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import {
-  FaCalendarAlt,
-  FaImage,
-  FaMapMarkerAlt,
-  FaPercentage,
-  FaSave,
-  FaSchool
-} from 'react-icons/fa'
+import { FaCalendarAlt, FaImage, FaMapMarkerAlt, FaPercentage, FaSchool } from 'react-icons/fa'
 import { useState } from 'react'
+import AnneeScolaires from './AnneeScolaires'
 
 const Etablissements = () => {
+  const userInfo = JSON.parse(localStorage.getItem('user'))
+  let schoolInfo = userInfo.School.dataValues
+  const schoolId = schoolInfo.id
+
   const [tabIndex, setTabIndex] = useState(0)
   return (
     <Container disableGutters>
@@ -47,7 +45,7 @@ const Etablissements = () => {
       </Grid>
       <Divider sx={{ borderColor: 'var(--secondary)', marginTop: '15px' }} />
       <Box sx={{ p: 2, margin: 'auto' }}>
-        <Paper elevation={3} sx={{ mt: 3, borderRadius: 2 }}>
+        <Paper elevation={1} sx={{ mt: 1, borderRadius: 2 }}>
           <Tabs
             value={tabIndex}
             onChange={(e, newValue) => setTabIndex(newValue)}
@@ -65,14 +63,13 @@ const Etablissements = () => {
             }}
             textColor="inherit"
             variant="fullWidth"
-            size="small"
           >
             <Tab icon={<FaSchool />} label="Général" />
             <Tab icon={<FaCalendarAlt />} label="Années Scolaires" />
             <Tab icon={<FaPercentage />} label="Notation & Coeff" />
           </Tabs>
 
-          <Box sx={{ p: 4 }}>
+          <Box sx={{ p: 2 }}>
             {/* Section 1: Informations Générales */}
             {tabIndex === 0 && (
               <Grid container spacing={3}>
@@ -154,77 +151,7 @@ const Etablissements = () => {
             )}
 
             {/* Section 2: Années Scolaires */}
-            {tabIndex === 1 && (
-              <Box>
-                <Typography variant="h6" gutterBottom mb={3} sx={{ color: 'var(--primary)' }}>
-                  Gestion des Périodes
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid size={6}>
-                    <TextField
-                      type="date"
-                      fullWidth
-                      label="Début des cours"
-                      InputLabelProps={{ shrink: true }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&:hover fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'var(--primary)'
-                          }
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid size={6}>
-                    <TextField
-                      type="date"
-                      fullWidth
-                      label="Fin des cours"
-                      InputLabelProps={{ shrink: true }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&:hover fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'var(--primary)'
-                          }
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <TextField
-                      fullWidth
-                      label="Année en cours"
-                      defaultValue="2023-2024"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&:hover fieldset': {
-                            borderColor: 'var(--secondary)'
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'var(--primary)'
-                          }
-                        }
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
+            {tabIndex === 1 && <AnneeScolaires school_id={schoolId} />}
 
             {/* Section 3: Paramètres de Notation */}
             {tabIndex === 2 && (
@@ -301,21 +228,6 @@ const Etablissements = () => {
                 </Grid>
               </Grid>
             )}
-
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                startIcon={<FaSave />}
-                sx={{
-                  textTransform: 'none',
-                  backgroundColor: 'var(--primary)'
-                }}
-              >
-                Enregistrer les modifications
-              </Button>
-            </Box>
           </Box>
         </Paper>
       </Box>

@@ -10,19 +10,18 @@ import {
 } from '@mui/material'
 import PropTypes from 'prop-types'
 import { useState } from 'react'
-import { FaCaretUp, FaPlusCircle, FaTeeth } from 'react-icons/fa'
-import { createClasse } from '../utils/Request'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { FaCalendar, FaCalendarAlt, FaPlusCircle } from 'react-icons/fa'
 import { Alert } from '../utils/Alert'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createAnneeScolaire } from '../utils/Request'
 
-const AddClasse = ({ open, handleClose, school_id }) => {
+const AddAnneeScolaire = ({ open, handleClose, school_id }) => {
   const [formData, setFormData] = useState({
     name: '',
-    level: '',
-    academic_year_id: '',
-    capacity: '',
-    classroom: '',
-    school_id: school_id
+    school_id: school_id,
+    start_date: '',
+    end_date: '',
+    is_active: 0
   })
 
   const handleChange = (e) => {
@@ -33,19 +32,21 @@ const AddClasse = ({ open, handleClose, school_id }) => {
   const queryclient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: createClasse,
+    mutationFn: createAnneeScolaire,
     onSuccess: (data) => {
       if (data && data.success == false) {
         Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
       } else {
         Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
         handleClose(true)
-        queryclient.invalidateQueries({ queryKey: ['classes'] })
+        queryclient.invalidateQueries({ queryKey: ['anneeScolaire'] })
         setFormData((prev) => ({
           ...prev,
           name: '',
-          level: '',
-          school_id: school_id
+          school_id: school_id,
+          start_date: '',
+          end_date: '',
+          is_active: 0
         }))
       }
     },
@@ -58,7 +59,6 @@ const AddClasse = ({ open, handleClose, school_id }) => {
     e.preventDefault()
     mutation.mutate(formData)
   }
-
   return (
     <Dialog
       open={open}
@@ -75,7 +75,7 @@ const AddClasse = ({ open, handleClose, school_id }) => {
           fontWeight: 'bold'
         }}
       >
-        Ajouter une nouvelle Classe
+        Ajouter une nouvelle année scolaire
       </DialogTitle>
       <DialogContent
         dividers={true}
@@ -84,7 +84,7 @@ const AddClasse = ({ open, handleClose, school_id }) => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid size={6}>
+          <Grid size={12}>
             <TextField
               label="Nom"
               size="small"
@@ -93,14 +93,14 @@ const AddClasse = ({ open, handleClose, school_id }) => {
               color="black"
               name="name"
               required
-              placeholder="4e A, 4e B"
+              placeholder="2021-2022"
               value={formData.name}
               onChange={handleChange}
               slotProps={{
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaTeeth color="var(--secondary)" />
+                      <FaCalendar color="var(--secondary)" />
                     </InputAdornment>
                   )
                 }
@@ -122,21 +122,21 @@ const AddClasse = ({ open, handleClose, school_id }) => {
           </Grid>
           <Grid size={6}>
             <TextField
-              label="Niveau"
+              label="Date de début"
               size="small"
               fullWidth
               margin="dense"
-              name="level"
-              required
-              placeholder="4e"
-              value={formData.level}
-              onChange={handleChange}
               color="black"
+              name="start_date"
+              required
+              type="date"
+              value={formData.start_date}
+              onChange={handleChange}
               slotProps={{
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaTeeth color="var(--secondary)" />
+                      <FaCalendarAlt color="var(--secondary)" />
                     </InputAdornment>
                   )
                 }
@@ -158,59 +158,21 @@ const AddClasse = ({ open, handleClose, school_id }) => {
           </Grid>
           <Grid size={6}>
             <TextField
-              label="Capaciter"
+              label="Date de fin"
               size="small"
               fullWidth
               margin="dense"
-              name="capacity"
-              type="number"
-              required
-              placeholder="Capaciter de la salle"
-              value={formData.capacity}
-              onChange={handleChange}
               color="black"
+              name="end_date"
+              required
+              type="date"
+              value={formData.end_date}
+              onChange={handleChange}
               slotProps={{
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaCaretUp color="var(--secondary)" />
-                    </InputAdornment>
-                  )
-                }
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'var(--secondary)'
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'var(--secondary)'
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'var(--primary)'
-                  }
-                }
-              }}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label="Salle N°"
-              size="small"
-              fullWidth
-              margin="dense"
-              name="classroom"
-              type="number"
-              required
-              placeholder="Numéro de la salle"
-              value={formData.classroom}
-              onChange={handleChange}
-              color="black"
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FaCaretUp color="var(--secondary)" />
+                      <FaCalendarAlt color="var(--secondary)" />
                     </InputAdornment>
                   )
                 }
@@ -251,10 +213,10 @@ const AddClasse = ({ open, handleClose, school_id }) => {
     </Dialog>
   )
 }
-AddClasse.propTypes = {
+AddAnneeScolaire.propTypes = {
   open: PropTypes.bool.isRequired,
   school_id: PropTypes.number.isRequired,
   handleClose: PropTypes.func.isRequired
 }
 
-export default AddClasse
+export default AddAnneeScolaire

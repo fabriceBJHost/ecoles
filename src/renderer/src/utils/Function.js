@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 /**
  * Formate un numéro de téléphone de manière lisible.
  * Gère les formats : 0612345678, +33612345678, 0033612345678
@@ -37,4 +39,16 @@ export const formatPhoneNumber = (phone, separator = ' ') => {
 
   // Retourne le numéro tel quel si aucun pattern ne correspond
   return cleaned
+}
+
+/**
+ * function who format date
+ * @param {Date} date
+ * @returns {string}
+ */
+export const parseDate = (date) => {
+  if (!date) return null
+  const dateParsed = dayjs(date).format('DD-MM-YYYY')
+
+  return dateParsed
 }

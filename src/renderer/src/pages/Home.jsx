@@ -10,6 +10,7 @@ import {
   Typography
 } from '@mui/material'
 import {
+  FaCalendarAlt,
   FaStickyNote,
   FaTachometerAlt,
   FaUserFriends,
@@ -37,6 +38,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const Home = () => {
   const fakerHead = [
+    {
+      title: 'Année Scolaire',
+      description: '2025-2026',
+      icon: <FaCalendarAlt size={20} color="#8e44ad" />
+    },
     {
       title: 'Total Surveillants',
       description: 12,

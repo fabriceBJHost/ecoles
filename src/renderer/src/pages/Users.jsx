@@ -110,8 +110,8 @@ const Users = () => {
           alignItems={'center'}
           justifyContent={'center'}
         >
-          <IconButton title="Voir plus de détail" onClick={onOpenSingle}>
-            <FaEye size={18} />
+          <IconButton title="Voir plus de détail" onClick={() => onOpenSingle(params.row.id)}>
+            <FaEye size={18} color="var(--primary)" />
           </IconButton>
           <IconButton title="Modifier">
             <FaEdit size={18} />
@@ -196,10 +196,19 @@ const Users = () => {
 
   const [openSingle, setOpenSingle] = useState(false)
   const onCloseSIngle = () => setOpenSingle(false)
-  const onOpenSingle = () => setOpenSingle(true)
+  const onOpenSingle = (id) => {
+    setIdToSend(id)
+    setOpenSingle(true)
+  }
+  const [idToSend, setIdToSend] = useState(null)
   return (
     <Container disableGutters>
-      <UserDetailsModal handleClose={onCloseSIngle} open={openSingle} />
+      <UserDetailsModal
+        handleClose={onCloseSIngle}
+        open={openSingle}
+        school_id={schoolId}
+        id={idToSend}
+      />
       <Grid spacing={2} container>
         <Grid size={{ lg: 6, md: 7, sm: 7 }}>
           <Stack

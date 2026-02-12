@@ -6,6 +6,7 @@ const { database } = require('../../databases/database')
 const UserController = require('../../databases/Controllers/UserController')
 const AuthController = require('../../databases/Controllers/AuthController')
 const ClasseController = require('../../databases/Controllers/ClasseController')
+const Annee_ScolaireController = require('../../databases/Controllers/Annee_ScolaireController')
 
 // importation de tous les models
 require('../../databases/Models/School')
@@ -79,3 +80,4 @@ app.on('window-all-closed', () => {
 UserController.userHandler(ipcMain)
 AuthController.userHandler(ipcMain)
 ClasseController.classHandler(ipcMain)
+Annee_ScolaireController.anneeScolaireHandler(ipcMain)

@@ -1,31 +1,27 @@
 import {
+  Box,
   Button,
   Card,
   CardContent,
-  Container,
-  Divider,
   Grid,
   IconButton,
   Stack,
-  Typography
+  ThemeProvider
 } from '@mui/material'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
-import { FaEdit, FaPlusCircle, FaTrashAlt, FaUsps } from 'react-icons/fa'
-import { allLocalClasse, deleteClasse } from '../utils/Request'
-import { appTheme } from '../utils/theme'
-import { ThemeProvider } from '@mui/material/styles'
 import { DataGrid } from '@mui/x-data-grid'
 import { frFR } from '@mui/x-data-grid/locales'
-import AddClasse from '../components/AddClasse'
-import { Alert, Confirm } from '../utils/Alert'
-import UpdateClasse from '../components/UpdateClasse'
+import { useMemo, useState } from 'react'
+import { appTheme } from '../utils/theme'
+import { FaEdit, FaPlusCircle, FaTrashAlt } from 'react-icons/fa'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { deleteAnneeScolaire, getAllAnneeScolaire } from '../utils/Request'
+import AddAnneeScolaire from '../components/AddAnneeScolaire'
+import { parseDate } from '../utils/Function'
+import { Confirm, Alert } from '../utils/Alert'
+import UpdateAnneeScolaire from '../components/UpdateAnneeScolaire'
 
-const Classes = () => {
-  const userInfo = JSON.parse(localStorage.getItem('user'))
-  let schoolInfo = userInfo.School.dataValues
-  const schoolId = schoolInfo.id
-
+// eslint-disable-next-line react/prop-types
+const AnneeScolaires = ({ school_id }) => {
   const [filterModel, setFilterModel] = useState({ items: [] })
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -34,13 +30,6 @@ const Classes = () => {
 
   const column = [
     {
-      field: 'academic_year_id',
-      headerName: 'Année scolaire',
-      headerAlign: 'center',
-      align: 'center',
-      width: 200
-    },
-    {
       field: 'name',
       headerName: 'Nom',
       headerAlign: 'center',
@@ -48,25 +37,26 @@ const Classes = () => {
       flex: 1
     },
     {
-      field: 'level',
-      headerName: 'Niveau',
+      field: 'start_date',
+      headerName: 'Date de début',
       headerAlign: 'center',
       align: 'center',
       flex: 1
     },
     {
-      field: 'capacity',
-      headerName: 'Capaciter',
+      field: 'end_date',
+      headerName: 'Date de fin',
       headerAlign: 'center',
       align: 'center',
-      width: 150
+      flex: 1
     },
     {
-      field: 'classroom',
-      headerName: 'Salle N°',
+      field: 'is_active',
+      headerName: 'Active',
       headerAlign: 'center',
       align: 'center',
-      width: 150
+      width: 150,
+      sortable: false
     },
     {
       field: 'action',
@@ -94,10 +84,16 @@ const Classes = () => {
 
   const { data, isLoading, isPlaceholderData, isError, error } = useQuery({
     // La queryKey inclut la page et le pageSize pour déclencher un fetch à chaque changement
-    queryKey: ['classes', schoolId, paginationModel.page, paginationModel.pageSize, filterModel],
+    queryKey: [
+      'anneeScolaire',
+      school_id,
+      paginationModel.page,
+      paginationModel.pageSize,
+      filterModel
+    ],
     queryFn: () =>
-      allLocalClasse({
-        school_id: schoolId,
+      getAllAnneeScolaire({
+        school_id: school_id,
         page: paginationModel.page,
         pageSize: paginationModel.pageSize,
         filters: filterModel.items,
@@ -112,26 +108,26 @@ const Classes = () => {
   const row = useMemo(() => {
     return dataItem.map((item) => ({
       id: item.id,
-      academic_year_id: item.id,
       name: item.name,
-      level: item.level,
-      capacity: item.capacity,
-      classroom: item.classroom
+      start_date: parseDate(item.start_date),
+      end_date: parseDate(item.end_date),
+      is_active: item.is_active
     }))
   }, [dataItem])
 
   const [openCreate, setOpenCreate] = useState(false)
-  const handleCloseCreate = () => setOpenCreate(false)
   const handleOpenCreate = () => setOpenCreate(true)
+  const handleCloseCreate = () => setOpenCreate(false)
 
   const queryclient = useQueryClient()
+
   const deleteMutation = useMutation({
-    mutationFn: deleteClasse,
+    mutationFn: deleteAnneeScolaire,
     onSuccess: (data) => {
       if (data && !data.success) {
         Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
       } else {
-        queryclient.invalidateQueries({ queryKey: ['classes'] })
+        queryclient.invalidateQueries({ queryKey: ['anneeScolaire'] })
         Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
       }
     },
@@ -143,7 +139,7 @@ const Classes = () => {
   const deleteFunction = async (id) => {
     const confirm = await Confirm(
       'êtes vous sûre ?',
-      'Voulez vous supprimer ce classe ?',
+      "Voulez vous supprimer l'année scolaire ?",
       'warning',
       'Oui',
       'var(--primary)',
@@ -151,7 +147,7 @@ const Classes = () => {
     )
 
     if (confirm) {
-      deleteMutation.mutate({ id: id, school_id: schoolId })
+      deleteMutation.mutate({ id: id, school_id: school_id })
     }
   }
 
@@ -164,43 +160,34 @@ const Classes = () => {
   }
 
   return (
-    <Container disableGutters>
-      <AddClasse handleClose={handleCloseCreate} open={openCreate} school_id={schoolId} />
-      <UpdateClasse
+    <Box>
+      <AddAnneeScolaire open={openCreate} school_id={school_id} handleClose={handleCloseCreate} />
+      <UpdateAnneeScolaire
+        open={openUpdate}
+        school_id={school_id}
         handleClose={handleCloseUpdate}
         id={idToUpdate}
-        open={openUpdate}
-        school_id={schoolId}
       />
       <Grid spacing={2} container>
-        <Grid size={{ lg: 6, md: 7, sm: 7 }}>
-          <Stack
-            direction={'row'}
-            spacing={1}
-            alignItems={'center'}
-            sx={{ color: 'var(--primary)' }}
-          >
-            <FaUsps size={29} style={{ fontWeight: 'bold' }} />
-            <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              Classes / Niveau
-            </Typography>
-          </Stack>
-        </Grid>
-        <Grid size={{ lg: 6, md: 5, sm: 5 }} textAlign={'right'}>
+        <Grid size={12} textAlign={'right'}>
           <Button
             size="small"
             variant="contained"
             startIcon={<FaPlusCircle size={16} />}
-            sx={{ textTransform: 'capitalize', background: 'var(--primary)', marginRight: '30px' }}
+            sx={{
+              textTransform: 'capitalize',
+              background: 'var(--primary)',
+              marginRight: '30px',
+              mb: 1
+            }}
             onClick={handleOpenCreate}
           >
             Nouveau
           </Button>
         </Grid>
       </Grid>
-      <Divider sx={{ borderColor: 'var(--secondary)', marginTop: '15px' }} />
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }} marginTop={3}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
           <Card style={{ height: '100%' }}>
             <CardContent>
               <div
@@ -240,8 +227,8 @@ const Classes = () => {
           </Card>
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   )
 }
 
-export default Classes
+export default AnneeScolaires

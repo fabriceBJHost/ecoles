@@ -16,6 +16,18 @@ if (process.contextIsolated) {
     })
 
     /**
+     * API année scolaire
+     */
+    contextBridge.exposeInMainWorld('anneeScolaire', {
+      getAllAnnee: (formData) => ipcRenderer.invoke('allAnneeScolaire', formData),
+      createAnneeScolaire: (formData) => ipcRenderer.invoke('createAnneeScolaire', formData),
+      getListAnnee: (formData) => ipcRenderer.invoke('getAnneeScolaireList', formData),
+      deleteAnnee: (formData) => ipcRenderer.invoke('deleteAnneeScolaire', formData),
+      updateAnneeScolaire: (formData) => ipcRenderer.invoke('updateAnneeScolaire', formData),
+      getOneAnneeScolaire: (formData) => ipcRenderer.invoke('getOneAnneeScolaire', formData)
+    })
+
+    /**
      * Api Users
      */
     contextBridge.exposeInMainWorld('users', {

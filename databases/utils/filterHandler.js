@@ -71,6 +71,8 @@ const buildSequelizeFilters = (muiFilters, quickFilter, searchableColumns = []) 
       // on la transforme en syntaxe de jointure Sequelize
       if (col.includes('.')) {
         finalColumn = `$${col}$`
+      } else if (col == 'academic_year_id') {
+        finalColumn = '$Annee_Scolaire.name$'
       }
 
       return {

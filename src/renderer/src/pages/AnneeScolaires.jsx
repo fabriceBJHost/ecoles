@@ -206,7 +206,7 @@ const AnneeScolaires = ({ school_id }) => {
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
                     showToolbar
-                    columnVisibilityModel={'stripped'}
+                    pageSizeOptions={[10, 50, 100, 200]}
                     paginationMode="server"
                     filterMode="server" // TRÈS IMPORTANT : dit au Grid de ne pas filtrer localement
                     filterModel={filterModel}

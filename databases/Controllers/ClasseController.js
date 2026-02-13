@@ -15,7 +15,7 @@ class ClasseController {
       try {
         const { school_id, page, pageSize, filters, quickFilter } = formData
         const offset = page * pageSize
-        const columnsToSearch = ['name', 'level', 'capacity', 'classroom']
+        const columnsToSearch = ['name', 'level', 'capacity', 'classroom', 'academic_year_id']
         const dynamicFilters = buildSequelizeFilters(filters, quickFilter, columnsToSearch)
         let whereClause = { school_id: school_id, ...dynamicFilters }
 

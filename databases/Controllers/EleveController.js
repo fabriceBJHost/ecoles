@@ -32,7 +32,14 @@ class EleveController {
       try {
         const { school_id, page, pageSize, filters, quickFilter } = formData
         const offset = page * pageSize
-        const columnsToSearch = []
+        const columnsToSearch = [
+          'firstname',
+          'lastname',
+          'address',
+          'academic_year_id',
+          'birthdate',
+          'status'
+        ]
         const dynamicFilters = buildSequelizeFilters(filters, quickFilter, columnsToSearch)
         let whereClause = { school_id: school_id, ...dynamicFilters }
 

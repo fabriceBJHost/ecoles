@@ -7,6 +7,7 @@ const UserController = require('../../databases/Controllers/UserController')
 const AuthController = require('../../databases/Controllers/AuthController')
 const ClasseController = require('../../databases/Controllers/ClasseController')
 const Annee_ScolaireController = require('../../databases/Controllers/Annee_ScolaireController')
+const EleveController = require('../../databases/Controllers/EleveController')
 
 // importation de tous les models
 require('../../databases/Models/School')
@@ -81,3 +82,4 @@ UserController.userHandler(ipcMain)
 AuthController.userHandler(ipcMain)
 ClasseController.classHandler(ipcMain)
 Annee_ScolaireController.anneeScolaireHandler(ipcMain)
+EleveController.eleveHandler(ipcMain)

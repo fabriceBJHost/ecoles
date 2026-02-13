@@ -48,6 +48,14 @@ if (process.contextIsolated) {
       updateClasse: (formData) => ipcRenderer.invoke('updateClasse', formData),
       getOneClasse: (formData) => ipcRenderer.invoke('getOneClasse', formData)
     })
+
+    contextBridge.exposeInMainWorld('etudiant', {
+      getEtudiant: (formData) => ipcRenderer.invoke('getEtudiants', formData),
+      createEtudiant: (formData) => ipcRenderer.invoke('createEleves', formData),
+      getOneEtudiant: (formData) => ipcRenderer.invoke('getOneEleves', formData),
+      deleteEtudiant: (formData) => ipcRenderer.invoke('deleteEtudiants', formData),
+      updateEtudiant: (formData) => ipcRenderer.invoke('updateEtudiants', formData)
+    })
   } catch (error) {
     console.error(error)
   }

@@ -144,3 +144,60 @@ export const getOneAnneeScolaire = async (formData) => {
 
   return response
 }
+
+// -------------------------------------- eleves ------------------------------------
+
+/**
+ * function to get all eleves
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getEleves = async (formData) => {
+  const response = await window.etudiant.getEtudiant(formData)
+
+  return response
+}
+
+/**
+ * function to create eleves
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const createEleves = async (formData) => {
+  const response = await window.etudiant.createEtudiant(formData)
+
+  return response
+}
+
+/**
+ * function to get one eleves
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getOneEleves = async (formData) => {
+  const response = await window.etudiant.getOneEtudiant(formData)
+
+  return response
+}
+
+/**
+ * function to delete eleves
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const deleteEleves = async (formData) => {
+  const response = await window.etudiant.deleteEtudiant(formData)
+
+  return response
+}
+
+/**
+ * function to update eleves
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const updateEleves = async (formData) => {
+  const response = await window.etudiant.updateEtudiant(formData)
+
+  return response
+}

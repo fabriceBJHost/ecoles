@@ -189,3 +189,94 @@ CREATE TABLE
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
+
+-- La Vue de Calcul des Moyennes (v_student_averages)
+CREATE VIEW
+  v_student_averages AS
+SELECT
+  g.school_id,
+  g.student_id,
+  g.academic_year_id,
+  g.term,
+  SUM(g.value * s.coefficient) / SUM(s.coefficient) AS calculated_average
+FROM
+  grades g
+  JOIN subjects s ON g.subject_id = s.id
+GROUP BY
+  g.school_id,
+  g.student_id,
+  g.academic_year_id,
+  g.term;
+
+-- Automatisation du Rang (Procédure Stockée)
+DELIMITER / / CREATE PROCEDURE generate_term_report_cards (
+  IN p_school_id BIGINT,
+  IN p_academic_year_id BIGINT,
+  IN p_term ENUM ('TRIMESTRE1', 'TRIMESTRE2', 'TRIMESTRE3')
+) BEGIN
+-- 1. Nettoyer les anciens bulletins du trimestre pour éviter les doublons
+DELETE FROM report_cards
+WHERE
+  school_id = p_school_id
+  AND academic_year_id = p_academic_year_id
+  AND term = p_term;
+
+-- 2. Insérer les nouvelles moyennes et calculer les rangs
+INSERT INTO
+  report_cards (
+    school_id,
+    student_id,
+    academic_year_id,
+    term,
+    average,
+    rank,
+    decision
+  )
+SELECT
+  sub.school_id,
+  sub.student_id,
+  sub.academic_year_id,
+  sub.term,
+  sub.calculated_average,
+  RANK() OVER (
+    PARTITION BY
+      e.class_id
+    ORDER BY
+      sub.calculated_average DESC
+  ) as student_rank,
+  CASE
+    WHEN sub.calculated_average >= 10 THEN 'ADMIS'
+    ELSE 'REDOUBLE'
+  END
+FROM
+  v_student_averages sub
+  JOIN enrollments e ON sub.student_id = e.student_id
+  AND sub.academic_year_id = e.academic_year_id
+WHERE
+  sub.school_id = p_school_id
+  AND sub.academic_year_id = p_academic_year_id
+  AND sub.term = p_term;
+
+END / / DELIMITER;
+
+-- Automatisation des Impayés (Le "Moteur")
+CREATE VIEW
+  v_student_balances AS
+SELECT
+  s.id AS student_id,
+  s.firstname,
+  s.lastname,
+  s.school_id,
+  ay.id AS academic_year_id,
+  -- Supposons un tarif fixe défini dans une config ou calculé ici
+  (150000) AS total_due, -- Exemple: Frais annuels totaux
+  COALESCE(SUM(p.amount), 0) AS total_paid,
+  (150000 - COALESCE(SUM(p.amount), 0)) AS balance
+FROM
+  students s
+  JOIN academic_years ay ON s.academic_year_id = ay.id
+  LEFT JOIN payments p ON s.id = p.student_id
+  AND ay.id = p.academic_year_id
+GROUP BY
+  s.id,
+  ay.id;

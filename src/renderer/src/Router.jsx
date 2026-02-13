@@ -9,6 +9,7 @@ import Classes from './pages/Classes'
 import Etablissements from './pages/Etablissements'
 import Profile from './pages/Profile'
 import Eleves from './pages/Eleves'
+import Matieres from './pages/Matieres'
 
 const Router = createHashRouter([
   {
@@ -48,6 +49,10 @@ const Router = createHashRouter([
       {
         path: '/eleves',
         element: <Eleves />
+      },
+      {
+        path: '/matieres',
+        element: <Matieres />
       }
     ]
   },

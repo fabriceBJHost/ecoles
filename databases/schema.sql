@@ -111,6 +111,17 @@ CREATE TABLE
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
 
+CREATE TABLE
+  IF NOT EXISTS usermatieres (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    matiere_id BIGINT,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (matiere_id) REFERENCES subjects (id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+
 -- emplois du temps
 CREATE TABLE
   IF NOT EXISTS schedules (
@@ -132,7 +143,8 @@ CREATE TABLE
     FOREIGN KEY (school_id) REFERENCES schools (id),
     FOREIGN KEY (class_id) REFERENCES classes (id),
     FOREIGN KEY (subject_id) REFERENCES subjects (id),
-    FOREIGN KEY (teacher_id) REFERENCES users (id) created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users (id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   );
 

@@ -8,6 +8,7 @@ const AuthController = require('../../databases/Controllers/AuthController')
 const ClasseController = require('../../databases/Controllers/ClasseController')
 const Annee_ScolaireController = require('../../databases/Controllers/Annee_ScolaireController')
 const EleveController = require('../../databases/Controllers/EleveController')
+const MatiereController = require('../../databases/Controllers/MatiereController')
 
 // importation de tous les models
 require('../../databases/Models/School')
@@ -16,6 +17,8 @@ require('../../databases/Models/Annee_Scolaire')
 require('../../databases/Models/User')
 require('../../databases/Models/Classes')
 require('../../databases/Models/Eleve')
+require('../../databases/Models/Matiere')
+require('../../databases/Models/UserMatiere')
 
 let mainWindow
 function createWindow() {
@@ -37,7 +40,12 @@ function createWindow() {
   mainWindow.on('ready-to-show', async () => {
     mainWindow.maximize()
     mainWindow.show()
-    await database.sync({ force: false, alter: true })
+    try {
+      await database.sync({ force: false, alter: true })
+      console.log('database initier...')
+    } catch (error) {
+      console.error('Erreur lors de la synchronisation :', error)
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -83,3 +91,4 @@ AuthController.userHandler(ipcMain)
 ClasseController.classHandler(ipcMain)
 Annee_ScolaireController.anneeScolaireHandler(ipcMain)
 EleveController.eleveHandler(ipcMain)
+MatiereController.matiereHandler(ipcMain)

@@ -20,6 +20,17 @@ export const getOneUser = async (formData) => {
   return response
 }
 
+/**
+ * function to get one single users
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getListUser = async (formData) => {
+  const response = await window.users.getListUsers(formData)
+
+  return response
+}
+
 // ---------------------------------------- classe -------------------------------------
 
 /**
@@ -198,6 +209,63 @@ export const deleteEleves = async (formData) => {
  */
 export const updateEleves = async (formData) => {
   const response = await window.etudiant.updateEtudiant(formData)
+
+  return response
+}
+
+// ----------------------------------- matieres -----------------------------
+
+/**
+ * function to get matiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getMatieres = async (formData) => {
+  const response = await window.matiere.getMatiere(formData)
+
+  return response
+}
+
+/**
+ * function to get one matiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getOneMatieres = async (formData) => {
+  const response = await window.matiere.getOneMatiere(formData)
+
+  return response
+}
+
+/**
+ * function to delete matiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const deleteMatieres = async (formData) => {
+  const response = await window.matiere.deleteMatiere(formData)
+
+  return response
+}
+
+/**
+ * function to create matiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const createMatieres = async (formData) => {
+  const response = await window.matiere.createMatiere(formData)
+
+  return response
+}
+
+/**
+ * function to create matiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const updateMatieres = async (formData) => {
+  const response = await window.matiere.updateMatiere(formData)
 
   return response
 }

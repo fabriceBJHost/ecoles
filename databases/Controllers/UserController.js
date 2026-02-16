@@ -66,6 +66,20 @@ class UserController {
     })
 
     /**
+     * function to get list users
+     */
+    IpcMain.handle('listUsers', async (event, formData) => {
+      try {
+        const { school_id } = formData
+        const result = await User.findAll({ where: { school_id: school_id }, raw: true })
+
+        return { success: true, data: result }
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    })
+
+    /**
      * function to delete users
      */
     IpcMain.handle('deleteUsers', async (event, formData) => {

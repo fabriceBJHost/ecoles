@@ -32,6 +32,7 @@ if (process.contextIsolated) {
      */
     contextBridge.exposeInMainWorld('users', {
       getUsers: (formData) => ipcRenderer.invoke('getLocalUsers', formData),
+      getListUsers: (formData) => ipcRenderer.invoke('listUsers', formData),
       getOneUsers: (formData) => ipcRenderer.invoke('getOneUsers', formData),
       deleteUsers: (formData) => ipcRenderer.invoke('deleteUsers', formData),
       updateUsers: (formData) => ipcRenderer.invoke('updateUsers', formData),
@@ -49,12 +50,27 @@ if (process.contextIsolated) {
       getOneClasse: (formData) => ipcRenderer.invoke('getOneClasse', formData)
     })
 
+    /**
+     * API etudiant
+     */
     contextBridge.exposeInMainWorld('etudiant', {
       getEtudiant: (formData) => ipcRenderer.invoke('getEtudiants', formData),
       createEtudiant: (formData) => ipcRenderer.invoke('createEleves', formData),
       getOneEtudiant: (formData) => ipcRenderer.invoke('getOneEleves', formData),
       deleteEtudiant: (formData) => ipcRenderer.invoke('deleteEtudiants', formData),
       updateEtudiant: (formData) => ipcRenderer.invoke('updateEtudiants', formData)
+    })
+
+    /**
+     * API matieres
+     */
+    contextBridge.exposeInMainWorld('matiere', {
+      getMatiere: (formData) => ipcRenderer.invoke('getMatieres', formData),
+      createMatiere: (formData) => ipcRenderer.invoke('createMatiere', formData),
+      updateMatiere: (formData) => ipcRenderer.invoke('updateMatiere', formData),
+      getOneMatiere: (formData) => ipcRenderer.invoke('getOneMatiere', formData),
+      deleteMatiere: (formData) => ipcRenderer.invoke('deleteMatiere', formData),
+      asingMatiereToProf: (formData) => ipcRenderer.invoke('asingMatiereToProf', formData)
     })
   } catch (error) {
     console.error(error)

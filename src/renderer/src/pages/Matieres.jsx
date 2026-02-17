@@ -10,14 +10,16 @@ import {
   ThemeProvider,
   Typography
 } from '@mui/material'
-import { FaBook, FaEdit, FaPlusCircle, FaTrashAlt } from 'react-icons/fa'
+import { FaBook, FaEdit, FaPlusCircle, FaTrashAlt, FaUserPlus } from 'react-icons/fa'
 import { appTheme } from '../utils/theme'
-import { useQuery } from '@tanstack/react-query'
-import { getMatieres } from '../utils/Request'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { deleteMatieres, getMatieres } from '../utils/Request'
 import { useMemo, useState } from 'react'
 import { frFR } from '@mui/x-data-grid/locales'
 import { DataGrid } from '@mui/x-data-grid'
 import AddMatiere from '../components/AddMatiere'
+import { Alert, Confirm } from '../utils/Alert'
+import UpdateMatiere from '../components/UpdateMatiere'
 
 const Matieres = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
@@ -35,23 +37,37 @@ const Matieres = () => {
       field: 'name',
       headerName: 'Nom',
       headerAlign: 'center',
-      align: 'center',
-      minWidth: 150
+      align: 'right',
+      minWidth: 180
     },
     {
       field: 'coefficient',
       headerName: 'Coeficient',
       headerAlign: 'center',
-      align: 'right',
+      align: 'center',
       width: 120
     },
     {
       field: 'teacher',
       headerName: 'Enseignants',
       headerAlign: 'center',
-      align: 'center',
+      align: 'left',
       minWidth: 150,
       flex: 1
+    },
+    {
+      field: 'niveau',
+      headerName: 'Niveau',
+      headerAlign: 'center',
+      align: 'left',
+      minWidth: 130
+    },
+    {
+      field: 'salle',
+      headerName: 'Salle N°',
+      headerAlign: 'center',
+      align: 'left',
+      minWidth: 150
     },
     {
       field: 'action',
@@ -61,13 +77,25 @@ const Matieres = () => {
       width: 150,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction={'row'} spacing={1} id={params.row.id} alignItems={'center'}>
-          <IconButton title="Modifier">
+        <Stack
+          direction={'row'}
+          spacing={1}
+          id={params.row.id}
+          alignItems={'center'}
+          justifyContent={'center'}
+        >
+          <IconButton
+            title="Assigné a un ou plusieur enseignant"
+            sx={{ color: 'var(--primary)!important' }}
+          >
+            <FaUserPlus size={18} />
+          </IconButton>
+          <IconButton title="Modifier" onClick={() => handleOpenUpdate(params.row.ids)}>
             <FaEdit size={18} />
           </IconButton>
           <IconButton
             title="Supprimer"
-            // onClick={() => deleteFunction(params.row.id)}
+            onClick={() => deleteFunction(params.row.ids)}
             sx={{ color: 'var(--error)!important' }}
           >
             <FaTrashAlt size={18} />
@@ -95,21 +123,76 @@ const Matieres = () => {
   const dataItem = data?.data ?? []
   console.log(dataItem)
 
+  const vueUserName = (firstName, lastName) => {
+    if (firstName !== null || lastName !== null) {
+      return `${firstName} ${lastName}`
+    } else {
+      return 'Auccune Enseignant assigné a la matière'
+    }
+  }
+
   const row = useMemo(() => {
-    return dataItem.map((item) => ({
-      id: item.id,
+    return dataItem.map((item, index) => ({
+      id: index,
+      ids: item.id,
       name: item.name,
       coefficient: item.coefficient,
-      teacher: item.id
+      teacher: vueUserName(item['Users.firstname'], item['Users.lastname'])
     }))
   }, [dataItem])
 
   const [openMatiere, setOpenMatiere] = useState(false)
   const handleOpenMatiere = () => setOpenMatiere(true)
   const handleCloseMatiere = () => setOpenMatiere(false)
+
+  const queryclient = useQueryClient()
+  const deleteMutation = useMutation({
+    mutationFn: deleteMatieres,
+    onSuccess: (data) => {
+      if (data && !data.success) {
+        Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
+      } else {
+        queryclient.invalidateQueries({ queryKey: ['Matieres'] })
+        Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
+      }
+    },
+    onError: (err) => {
+      Alert('Erreur', err.message, 'error', 'OK', 'var(--primary)')
+    }
+  })
+
+  const deleteFunction = async (id) => {
+    const confirm = await Confirm(
+      'êtes vous sûre ?',
+      'Voulez vous supprimer ce matière ?',
+      'warning',
+      'Oui',
+      'var(--primary)',
+      'Non'
+    )
+
+    if (confirm) {
+      deleteMutation.mutate({ id: id, school_id: schoolId })
+    }
+  }
+
+  const [openUpdate, setOpenUpdate] = useState(false)
+  const handleCloseUpdate = () => setOpenUpdate(false)
+  const [idUpdate, setIdUpdate] = useState(null)
+  const handleOpenUpdate = (id) => {
+    setIdUpdate(id)
+    setOpenUpdate(true)
+  }
+
   return (
     <Container disableGutters>
       <AddMatiere handleClose={handleCloseMatiere} open={openMatiere} school_id={schoolId} />
+      <UpdateMatiere
+        handleClose={handleCloseUpdate}
+        id={idUpdate}
+        open={openUpdate}
+        school_id={schoolId}
+      />
       <Grid spacing={2} container>
         <Grid size={{ lg: 6, md: 7, sm: 7 }}>
           <Stack

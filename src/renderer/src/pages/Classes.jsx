@@ -76,7 +76,13 @@ const Classes = () => {
       width: 150,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction={'row'} spacing={1} id={params.row.id} alignItems={'center'}>
+        <Stack
+          direction={'row'}
+          spacing={1}
+          id={params.row.id}
+          alignItems={'center'}
+          justifyContent={'center'}
+        >
           <IconButton title="Modifier" onClick={() => handleOpenUpdate(params.row.id)}>
             <FaEdit size={18} />
           </IconButton>

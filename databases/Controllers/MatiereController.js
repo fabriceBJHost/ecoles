@@ -45,7 +45,7 @@ class MatiereController {
           raw: true,
           include: [
             {
-              model: User, // On demande le modèle User directement
+              model: User,
               required: false
             }
           ],
@@ -113,6 +113,9 @@ class MatiereController {
       }
     })
 
+    /**
+     * function to asign matiere to users
+     */
     IpcMain.handle('asingMatiereToProf', async (event, formData) => {
       try {
         const { matiere_id, user_id } = formData

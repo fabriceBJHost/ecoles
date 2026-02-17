@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
   Dialog,
@@ -9,45 +9,41 @@ import {
   InputAdornment,
   TextField
 } from '@mui/material'
-import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Alert } from '../utils/Alert'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import PropTypes from 'prop-types'
+import { FaRegEdit, FaSortNumericUp } from 'react-icons/fa'
+import { getOneMatieres, updateMatieres } from '../utils/Request'
+import { useEffect, useState } from 'react'
 import { FaBookBookmark } from 'react-icons/fa6'
-import { FaPlusCircle, FaSortNumericUp } from 'react-icons/fa'
-import { createMatieres } from '../utils/Request'
+import { Alert } from '../utils/Alert'
 
-const AddMatiere = ({ open, handleClose, school_id }) => {
+const UpdateMatiere = ({ open, handleClose, school_id, id }) => {
   const [formData, setFormData] = useState({
+    id: '',
     name: '',
     coefficient: '',
     school_id: school_id
   })
 
-  // const usersItems = users.data ?? []
+  const { data } = useQuery({
+    queryKey: ['singleMatieres', id, school_id],
+    queryFn: () => getOneMatieres({ id, school_id }),
+    enabled: !!id
+  })
 
-  // const selectedUser = useMemo(
-  //   () => usersItems.find((item) => item.id === formData.teacher_id) || null,
-  //   [usersItems, formData.teacher_id]
-  // )
+  const matiere = data?.data ?? {}
 
-  // const filteredUser = useMemo(() => {
-  //   return (options, params) => {
-  //     const input = params.inputValue.toLowerCase()
-  //     return options.filter((option) => {
-  //       return (
-  //         option.username?.toLowerCase().includes(input) ||
-  //         option.firstname?.toLowerCase().includes(input) ||
-  //         option.lastname?.toLowerCase().includes(input)
-  //       )
-  //     })
-  //   }
-  // }, [])
-
-  // const RenderMemberOption = memo(({ props, option }) => (
-  //   <li {...props} key={option.id}>
-  //     {option.username} | {option.firstname} | {option.lastname}
-  //   </li>
-  // ))
+  useEffect(() => {
+    if (matiere && Object.keys(matiere).length !== 0) {
+      setFormData((prev) => ({
+        ...prev,
+        id: matiere.id,
+        name: matiere.name,
+        coefficient: matiere.coefficient,
+        school_id: matiere.school_id
+      }))
+    }
+  }, [matiere])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -57,7 +53,7 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
   const queryclient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: createMatieres,
+    mutationFn: updateMatieres,
     onSuccess: (data) => {
       if (data && data.success == false) {
         Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
@@ -65,10 +61,12 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
         Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
         handleClose(true)
         queryclient.invalidateQueries({ queryKey: ['Matieres'] })
+        queryclient.invalidateQueries({ queryKey: ['singleMatieres'] })
         setFormData((prev) => ({
           ...prev,
+          id: '',
           name: '',
-          coefficient: '',
+          level: '',
           school_id: school_id
         }))
       }
@@ -98,7 +96,7 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
           fontWeight: 'bold'
         }}
       >
-        Ajouter une nouvelle Matiere
+        Modifier une Matière
       </DialogTitle>
       <DialogContent
         dividers={true}
@@ -180,52 +178,6 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
               }}
             />
           </Grid>
-          {/* <Grid size={12}>
-            <Autocomplete
-              options={usersItems}
-              value={selectedUser}
-              getOptionLabel={(option) => option.firstname + ' ' + option.lastname || ''}
-              filterOptions={filteredUser}
-              onChange={(event, newValue) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  teacher_id: newValue ? newValue.id : ''
-                }))
-              }}
-              renderOption={(props, option) => <RenderMemberOption props={props} option={option} />}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  color="black"
-                  label="Sélectionner une enseignant"
-                  placeholder="Choisir une enseignant"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'var(--secondary)'
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'var(--secondary)'
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'var(--primary)'
-                      }
-                    }
-                  }}
-                  margin="dense"
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <FaUser color="var(--secondary)" />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              )}
-            />
-          </Grid> */}
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -239,13 +191,19 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
             color: 'var(--primary)'
           }}
           size="small"
-          startIcon={<FaPlusCircle size={15} />}
+          startIcon={<FaRegEdit size={15} />}
         >
-          Ajouter
+          Modifier
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
+UpdateMatiere.propTypes = {
+  open: PropTypes.bool.isRequired,
+  school_id: PropTypes.number.isRequired,
+  id: PropTypes.number.isRequired,
+  handleClose: PropTypes.func.isRequired
+}
 
-export default AddMatiere
+export default UpdateMatiere

@@ -109,7 +109,13 @@ const Eleves = () => {
       width: 150,
       sortable: false,
       renderCell: (params) => (
-        <Stack direction={'row'} spacing={1} id={params.row.id} alignItems={'center'}>
+        <Stack
+          direction={'row'}
+          spacing={1}
+          id={params.row.id}
+          alignItems={'center'}
+          justifyContent={'center'}
+        >
           <IconButton title="Modifier">
             <FaEdit size={18} />
           </IconButton>

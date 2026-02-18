@@ -269,3 +269,25 @@ export const updateMatieres = async (formData) => {
 
   return response
 }
+
+/**
+ * function to get userId from table pivot userMatiere
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getUserIdUserMatieres = async (formData) => {
+  const response = await window.matiere.getUserIdUserMatieres(formData)
+
+  return response
+}
+
+/**
+ * function to assign matiere to prof
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const asingMatiereToProf = async (formData) => {
+  const response = await window.matiere.asingMatiereToProf(formData)
+
+  return response
+}

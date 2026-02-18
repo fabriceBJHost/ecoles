@@ -23,32 +23,6 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
     school_id: school_id
   })
 
-  // const usersItems = users.data ?? []
-
-  // const selectedUser = useMemo(
-  //   () => usersItems.find((item) => item.id === formData.teacher_id) || null,
-  //   [usersItems, formData.teacher_id]
-  // )
-
-  // const filteredUser = useMemo(() => {
-  //   return (options, params) => {
-  //     const input = params.inputValue.toLowerCase()
-  //     return options.filter((option) => {
-  //       return (
-  //         option.username?.toLowerCase().includes(input) ||
-  //         option.firstname?.toLowerCase().includes(input) ||
-  //         option.lastname?.toLowerCase().includes(input)
-  //       )
-  //     })
-  //   }
-  // }, [])
-
-  // const RenderMemberOption = memo(({ props, option }) => (
-  //   <li {...props} key={option.id}>
-  //     {option.username} | {option.firstname} | {option.lastname}
-  //   </li>
-  // ))
-
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
@@ -180,52 +154,6 @@ const AddMatiere = ({ open, handleClose, school_id }) => {
               }}
             />
           </Grid>
-          {/* <Grid size={12}>
-            <Autocomplete
-              options={usersItems}
-              value={selectedUser}
-              getOptionLabel={(option) => option.firstname + ' ' + option.lastname || ''}
-              filterOptions={filteredUser}
-              onChange={(event, newValue) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  teacher_id: newValue ? newValue.id : ''
-                }))
-              }}
-              renderOption={(props, option) => <RenderMemberOption props={props} option={option} />}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  color="black"
-                  label="Sélectionner une enseignant"
-                  placeholder="Choisir une enseignant"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'var(--secondary)'
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'var(--secondary)'
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'var(--primary)'
-                      }
-                    }
-                  }}
-                  margin="dense"
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <FaUser color="var(--secondary)" />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              )}
-            />
-          </Grid> */}
         </Grid>
       </DialogContent>
       <DialogActions>

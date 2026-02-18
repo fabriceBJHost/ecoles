@@ -70,7 +70,8 @@ if (process.contextIsolated) {
       updateMatiere: (formData) => ipcRenderer.invoke('updateMatiere', formData),
       getOneMatiere: (formData) => ipcRenderer.invoke('getOneMatiere', formData),
       deleteMatiere: (formData) => ipcRenderer.invoke('deleteMatiere', formData),
-      asingMatiereToProf: (formData) => ipcRenderer.invoke('asingMatiereToProf', formData)
+      asingMatiereToProf: (formData) => ipcRenderer.invoke('asingMatiereToProf', formData),
+      getUserIdUserMatieres: (formData) => ipcRenderer.invoke('getUserIdFromUserMatieres', formData)
     })
   } catch (error) {
     console.error(error)

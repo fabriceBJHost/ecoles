@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize')
 const { database } = require('../database')
 const User = require('./User')
 const Matiere = require('./Matiere')
+const School = require('./School')
 
 const UserMatiere = database.define(
   'UserMatiere',
@@ -12,6 +13,13 @@ const UserMatiere = database.define(
       primaryKey: true,
       autoIncrement: true,
       allowNull: false
+    },
+    school_id: {
+      type: DataTypes.BIGINT,
+      references: {
+        model: School,
+        key: 'id'
+      }
     }
   },
   {
@@ -22,6 +30,9 @@ const UserMatiere = database.define(
     tableName: 'usermatieres' // definir le nom du table
   }
 )
+School.hasMany(UserMatiere, { foreignKey: 'school_id' })
+UserMatiere.belongsTo(School, { foreignKey: 'school_id' })
+
 // Un utilisateur (prof) enseigne plusieurs matières
 User.belongsToMany(Matiere, {
   through: UserMatiere,

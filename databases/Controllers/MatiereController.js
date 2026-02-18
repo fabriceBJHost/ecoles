@@ -1,7 +1,6 @@
 const Matiere = require('../Models/Matiere')
 const User = require('../Models/User')
 const UserMatiere = require('../Models/UserMatiere')
-const { buildSequelizeFilters } = require('../utils/filterHandler')
 
 class MatiereController {
   /**
@@ -31,17 +30,10 @@ class MatiereController {
      */
     IpcMain.handle('getMatieres', async (event, formData) => {
       try {
-        const { school_id, page, pageSize, filters, quickFilter } = formData
-        const offset = page * pageSize
-        const columnsToSearch = []
+        const { school_id } = formData
 
-        const dynamicFilters = buildSequelizeFilters(filters, quickFilter, columnsToSearch)
-        let whereClause = { school_id: school_id, ...dynamicFilters }
-
-        const result = await Matiere.findAndCountAll({
-          where: whereClause,
-          limit: pageSize,
-          offset: offset,
+        const result = await Matiere.findAll({
+          where: { school_id: school_id },
           raw: true,
           include: [
             {
@@ -52,7 +44,7 @@ class MatiereController {
           subQuery: false
         })
 
-        return { success: true, data: result.rows, count: result.count }
+        return { success: true, data: result }
       } catch (error) {
         return { success: false, message: error }
       }
@@ -118,16 +110,42 @@ class MatiereController {
      */
     IpcMain.handle('asingMatiereToProf', async (event, formData) => {
       try {
-        const { matiere_id, user_id } = formData
+        const { matiere_id, user_id, school_id } = formData
 
-        for (let index = 0; index < user_id.length; index++) {
-          await UserMatiere.create({
-            user_id: user_id[index],
-            matiere_id
-          })
-        }
+        // 1. On supprime toutes les relations existantes pour cette matière spécifique
+        await UserMatiere.destroy({
+          where: { matiere_id: matiere_id, school_id }
+        })
 
-        return { success: true, message: 'Matiere a été assigner a un professeur' }
+        // 2. On prépare les données pour une insertion groupée (plus performant qu'une boucle)
+        const records = user_id.map((id) => ({
+          user_id: id,
+          matiere_id: matiere_id,
+          school_id
+        }))
+
+        // 3. On insère tout d'un coup
+        await UserMatiere.bulkCreate(records)
+
+        return { success: true, message: 'Assignations mises à jour avec succès' }
+      } catch (error) {
+        return { success: false, message: error.message }
+      }
+    })
+
+    /**
+     * function to get matiere_id from usermatieres pivot table
+     */
+    IpcMain.handle('getUserIdFromUserMatieres', async (event, formData) => {
+      try {
+        const { school_id, matiere_id } = formData
+
+        const result = await UserMatiere.findAll({
+          where: { school_id: school_id, matiere_id: matiere_id },
+          raw: true
+        })
+
+        return { success: true, data: result }
       } catch (error) {
         return { success: false, message: error }
       }

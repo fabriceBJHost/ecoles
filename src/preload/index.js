@@ -47,7 +47,8 @@ if (process.contextIsolated) {
       createClasse: (formData) => ipcRenderer.invoke('createClasse', formData),
       deleteClasse: (formData) => ipcRenderer.invoke('deleteClasse', formData),
       updateClasse: (formData) => ipcRenderer.invoke('updateClasse', formData),
-      getOneClasse: (formData) => ipcRenderer.invoke('getOneClasse', formData)
+      getOneClasse: (formData) => ipcRenderer.invoke('getOneClasse', formData),
+      listClasse: (formData) => ipcRenderer.invoke('listClasse', formData)
     })
 
     /**

@@ -39,6 +39,25 @@ class ClasseController {
     })
 
     /**
+     * function to get list of classe
+     */
+    IpcMain.handle('listClasse', async (event, formData) => {
+      try {
+        const { school_id } = formData
+
+        const result = await Classes.findAll({
+          where: { school_id: school_id },
+          raw: true,
+          attributes: ['id', 'name', 'level']
+        })
+
+        return { success: true, data: result }
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    })
+
+    /**
      * function to create classe
      */
     IpcMain.handle('createClasse', async (event, formData) => {

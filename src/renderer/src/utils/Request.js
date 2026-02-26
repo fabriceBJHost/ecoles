@@ -45,6 +45,17 @@ export const allLocalClasse = async (formData) => {
 }
 
 /**
+ * function to get list of all local classes
+ * @param {Object} formData
+ * @returns {Array}
+ */
+export const listClasse = async (formData) => {
+  const response = await window.classe.listClasse(formData)
+
+  return response
+}
+
+/**
  * function to create classe
  * @param {Object} formData
  * @returns {Object}

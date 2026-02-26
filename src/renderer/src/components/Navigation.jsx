@@ -34,6 +34,7 @@ import {
   FaUserGraduate,
   FaBook
 } from 'react-icons/fa'
+import { MdViewTimeline } from 'react-icons/md'
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -584,6 +585,48 @@ const Navigation = ({ children, setSearchItem }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={'matieres'}
+                  sx={[
+                    {
+                      color: 'var(--primary)',
+                      textTransform: 'capitalize'
+                    },
+                    open ? { opacity: 1 } : { opacity: 0 }
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+
+          {/* emploi du temps */}
+          <Link to={'/schedule'} className={classe.menu}>
+            <ListItem
+              disablePadding
+              sx={{ display: 'block' }}
+              className={location.pathname == '/schedule' && classe.menuActive}
+            >
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 32,
+                    px: 2
+                  },
+                  open ? { justifyContent: 'initial' } : { justifyContent: 'center' }
+                ]}
+              >
+                <ListItemIcon
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      fontSize: '1.1rem'
+                    },
+                    open ? { mr: 2 } : { mr: 'auto' }
+                  ]}
+                >
+                  <MdViewTimeline size={25} color="var(--primary)" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={'emploi du temps'}
                   sx={[
                     {
                       color: 'var(--primary)',

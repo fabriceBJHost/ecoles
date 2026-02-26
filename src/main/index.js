@@ -19,6 +19,7 @@ require('../../databases/Models/Classes')
 require('../../databases/Models/Eleve')
 require('../../databases/Models/Matiere')
 require('../../databases/Models/UserMatiere')
+require('../../databases/Models/Schedule')
 
 let mainWindow
 function createWindow() {

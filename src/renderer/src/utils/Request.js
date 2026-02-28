@@ -302,3 +302,27 @@ export const asingMatiereToProf = async (formData) => {
 
   return response
 }
+
+// ---------------------------------------- schedule ---------------------------------
+
+/**
+ * function to create emploi du temps
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const createShedule = async (formData) => {
+  const response = await window.schedule.createShedule(formData)
+
+  return response
+}
+
+/**
+ * function to get emploi du temps
+ * @param {Object} formData
+ * @returns {Array}
+ */
+export const getSchedule = async (formData) => {
+  const response = await window.schedule.getSchedule(formData)
+
+  return response
+}

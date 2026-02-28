@@ -74,6 +74,14 @@ if (process.contextIsolated) {
       asingMatiereToProf: (formData) => ipcRenderer.invoke('asingMatiereToProf', formData),
       getUserIdUserMatieres: (formData) => ipcRenderer.invoke('getUserIdFromUserMatieres', formData)
     })
+
+    /**
+     * API schedule
+     */
+    contextBridge.exposeInMainWorld('schedule', {
+      createShedule: (formData) => ipcRenderer.invoke('createShedule', formData),
+      getSchedule: (formData) => ipcRenderer.invoke('getSchedule', formData)
+    })
   } catch (error) {
     console.error(error)
   }

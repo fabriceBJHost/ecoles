@@ -9,6 +9,7 @@ const ClasseController = require('../../databases/Controllers/ClasseController')
 const Annee_ScolaireController = require('../../databases/Controllers/Annee_ScolaireController')
 const EleveController = require('../../databases/Controllers/EleveController')
 const MatiereController = require('../../databases/Controllers/MatiereController')
+const ScheduleController = require('../../databases/Controllers/ScheduleController')
 
 // importation de tous les models
 require('../../databases/Models/School')
@@ -93,3 +94,4 @@ ClasseController.classHandler(ipcMain)
 Annee_ScolaireController.anneeScolaireHandler(ipcMain)
 EleveController.eleveHandler(ipcMain)
 MatiereController.matiereHandler(ipcMain)
+ScheduleController.scheduleHandler(ipcMain)

@@ -3,7 +3,9 @@
 /* eslint-disable react/prop-types */
 import {
   Autocomplete,
+  Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
@@ -11,7 +13,7 @@ import {
   MenuItem,
   TextField
 } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { memo, useMemo, useState } from 'react'
 import {
   FaBook,
@@ -19,9 +21,11 @@ import {
   FaDyalog,
   FaHourglassEnd,
   FaHourglassStart,
+  FaPlusCircle,
   FaUser
 } from 'react-icons/fa'
-import { getListUser, getMatieres, listClasse } from '../utils/Request'
+import { createShedule, getListUser, getMatieres, listClasse } from '../utils/Request'
+import { Alert } from '../utils/Alert'
 
 const CreateShedule = ({ open, handleClose, school_id }) => {
   const [formData, setFormData] = useState({
@@ -37,10 +41,6 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-  }
-
-  const formSubmit = (e) => {
-    e.preventDefault()
   }
 
   const { data } = useQuery({
@@ -62,6 +62,7 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
   const usersItems = users.data ?? []
   const matiereItems = matiere.data ?? []
   const userFiltered = []
+  const [newUsers, setNewUsers] = useState([])
 
   const newObjectMatieres = useMemo(() => {
     const grouped = matiereItems.reduce((acc, item) => {
@@ -69,8 +70,8 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
       const users = {
         id: item['Users.id'],
         matiere_id: item.id,
-        nom: item['Users.firstname'],
-        prenom: item['Users.lastname']
+        firstname: item['Users.firstname'],
+        lastname: item['Users.lastname']
       }
 
       if (!acc[id]) {
@@ -91,7 +92,10 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
 
     const values = Object.values(grouped)
     for (let index = 0; index < values.length; index++) {
-      userFiltered.push(values[index].users)
+      const doubleArray = values[index].users
+      for (let index = 0; index < doubleArray.length; index++) {
+        userFiltered.push(doubleArray[index])
+      }
     }
 
     return Object.values(grouped).map((matiere) => ({
@@ -101,9 +105,22 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
     }))
   }, [matiereItems, userFiltered])
 
-  console.log(userFiltered)
+  const findUserByMatieres = (id) => {
+    let tmpData = []
+    for (let index = 0; index < userFiltered.length; index++) {
+      if (userFiltered[index].matiere_id == id) {
+        tmpData.push(userFiltered[index])
+      }
+    }
+    setNewUsers(tmpData)
+  }
 
   const selectedUser = useMemo(
+    () => newUsers.find((item) => item.id === formData.teacher_id) || null,
+    [newUsers, formData.teacher_id]
+  )
+
+  const selectedUser2 = useMemo(
     () => usersItems.find((item) => item.id === formData.teacher_id) || null,
     [usersItems, formData.teacher_id]
   )
@@ -113,7 +130,6 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
       const input = params.inputValue.toLowerCase()
       return options.filter((option) => {
         return (
-          option.username?.toLowerCase().includes(input) ||
           option.firstname?.toLowerCase().includes(input) ||
           option.lastname?.toLowerCase().includes(input)
         )
@@ -160,6 +176,30 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
       {option.firstname} {option.lastname}
     </li>
   ))
+
+  const queryclient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: createShedule,
+    onSuccess: (data) => {
+      if (data && data.success == false) {
+        Alert('Erreur', data.message, 'error', 'OK', 'var(--primary)')
+      } else {
+        Alert('Action terminer', data.message, 'success', 'OK', 'var(--primary)')
+        handleClose(true)
+        queryclient.invalidateQueries({ queryKey: ['schedules'] })
+      }
+    },
+    onError: (error) => {
+      Alert('Erreur', error.message, 'error', 'OK', 'var(--primary)')
+    }
+  })
+
+  const formSubmit = (e) => {
+    e.preventDefault()
+
+    mutation.mutate(formData)
+  }
 
   return (
     <Dialog
@@ -357,10 +397,11 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
               getOptionLabel={(option) => option.name}
               filterOptions={filteredMatiere}
               onChange={(event, newValue) => {
-                setFormData((prev) => ({
+                ;(setFormData((prev) => ({
                   ...prev,
                   subject_id: newValue ? newValue.id : ''
-                }))
+                })),
+                  findUserByMatieres(newValue.id))
               }}
               renderOption={(props, option) => <RenderClassOption props={props} option={option} />}
               renderInput={(params) => (
@@ -399,8 +440,8 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
           </Grid>
           <Grid size={6}>
             <Autocomplete
-              options={usersItems}
-              value={selectedUser}
+              options={newUsers.length !== 0 ? newUsers : usersItems}
+              value={newUsers.length !== 0 ? selectedUser : selectedUser2}
               getOptionLabel={(option) => option.firstname + ' ' + option.lastname || ''}
               filterOptions={filteredUser}
               onChange={(event, newValue) => {
@@ -416,6 +457,7 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
                   color="black"
                   label="Sélectionner une enseignant(e)"
                   placeholder="Choisir une enseignant(e)"
+                  helperText="Sélectionner la matiere pour plus de filtre"
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': {
@@ -446,6 +488,22 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
           </Grid>
         </Grid>
       </DialogContent>
+      <DialogActions>
+        <Button
+          variant="text"
+          type="submit"
+          sx={{
+            textTransform: 'none',
+            fontSize: '1rem',
+            borderRadius: 2,
+            color: 'var(--primary)'
+          }}
+          size="small"
+          startIcon={<FaPlusCircle size={15} />}
+        >
+          Modifier
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }

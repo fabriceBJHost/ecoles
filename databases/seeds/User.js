@@ -51,7 +51,8 @@ const seedUser = async () => {
         // On s'assure que le numéro ne dépasse pas 15 caractères
         numbers1: faker.phone.number().substring(0, 15),
         numbers2: faker.helpers.maybe(() => faker.phone.number().substring(0, 15)),
-        address: faker.location.streetAddress(true).substring(0, 300)
+        address: faker.location.streetAddress(true).substring(0, 300),
+        // gender:
       })
     }
 

@@ -56,13 +56,14 @@ const Profile = () => {
           }
           title={
             <Typography variant="h5" fontWeight="600">
-              {userInfo.full_name}
+              {userInfo.firstname} {userInfo.lastname}
             </Typography>
           }
           subheader={
             <Typography variant="body2" color="text.secondary">
               @{userInfo.username} •{' '}
-              {userInfo.role.charAt(0).toUpperCase() + userInfo.role.slice(1)}
+              {userInfo.Role.dataValues.nom.charAt(0).toUpperCase() +
+                userInfo.Role.dataValues.nom.slice(1)}
             </Typography>
           }
         />

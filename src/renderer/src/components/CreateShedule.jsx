@@ -501,7 +501,7 @@ const CreateShedule = ({ open, handleClose, school_id }) => {
           size="small"
           startIcon={<FaPlusCircle size={15} />}
         >
-          Modifier
+          Enregistrer
         </Button>
       </DialogActions>
     </Dialog>

@@ -59,6 +59,10 @@ const User = database.define(
     address: {
       type: DataTypes.STRING(300),
       allowNull: false
+    },
+    gender: {
+      type: DataTypes.ENUM('M', 'F'),
+      allowNull: true
     }
   },
   {

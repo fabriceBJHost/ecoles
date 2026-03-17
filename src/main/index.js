@@ -39,6 +39,13 @@ function createWindow() {
     }
   })
 
+  // Désactiver les raccourcis clavier
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.control || input.meta || input.alt || input.key === 'F11') {
+      event.preventDefault()
+    }
+  })
+
   mainWindow.on('ready-to-show', async () => {
     mainWindow.maximize()
     mainWindow.show()

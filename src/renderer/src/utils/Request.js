@@ -326,3 +326,25 @@ export const getSchedule = async (formData) => {
 
   return response
 }
+
+/**
+ * function to get one emploi du temps
+ * @param {Object} formData
+ * @returns {Object}
+ */
+export const getOneSchedule = async (formData) => {
+  const response = await window.schedule.getOneSchedules(formData)
+
+  return response
+}
+
+/**
+ * function to update emploi du temps
+ * @param {Array} formData
+ * @returns {Object}
+ */
+export const updateSchedule = async (formData) => {
+  const response = await window.schedule.updateSchedules(formData)
+
+  return response
+}

@@ -80,7 +80,9 @@ if (process.contextIsolated) {
      */
     contextBridge.exposeInMainWorld('schedule', {
       createShedule: (formData) => ipcRenderer.invoke('createShedule', formData),
-      getSchedule: (formData) => ipcRenderer.invoke('getSchedule', formData)
+      getSchedule: (formData) => ipcRenderer.invoke('getSchedule', formData),
+      updateSchedules: (formData) => ipcRenderer.invoke('updateSchedules', formData),
+      getOneSchedules: (formData) => ipcRenderer.invoke('getOneSchedules', formData)
     })
   } catch (error) {
     console.error(error)

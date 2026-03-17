@@ -2,7 +2,6 @@
 import {
   Button,
   Card,
-  CardContent,
   Container,
   Divider,
   Grid,
@@ -19,11 +18,12 @@ import {
   Typography
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { FaPlusCircle, FaSearch } from 'react-icons/fa'
+import { FaEdit, FaPlusCircle, FaSearch } from 'react-icons/fa'
 import { MdViewTimeline } from 'react-icons/md'
 import { getSchedule, listClasse } from '../utils/Request'
 import { useEffect, useState } from 'react'
 import CreateShedule from '../components/CreateShedule'
+import UpdateSchedule from '../components/UpdateSchedule'
 
 const Schedules = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
@@ -38,6 +38,7 @@ const Schedules = () => {
   const ListClass = datas.data ?? []
 
   const [class_id, setClass_id] = useState()
+
   useEffect(() => {
     if (ListClass.length !== 0) {
       setClass_id(ListClass[0].id)
@@ -50,7 +51,6 @@ const Schedules = () => {
   })
 
   const scheduleItem = schedules.data ?? []
-  console.log(scheduleItem)
 
   const [openCreate, setOpenCrete] = useState(false)
   const handleCloseCreate = () => setOpenCrete(false)
@@ -68,7 +68,8 @@ const Schedules = () => {
     '14:00',
     '15:00',
     '16:00',
-    '17:00'
+    '17:00',
+    '18:00'
   ]
 
   // Fonction utilitaire pour calculer la durée (rowSpan)
@@ -102,9 +103,23 @@ const Schedules = () => {
   // On filtre la liste originale
   const filteredList = ListClass.filter((item) => item.name.toLowerCase().includes(searchTerm))
 
+  const [openUpdate, setOpenUpdate] = useState(false)
+  const [idUpdate, setIdUpdate] = useState(null)
+  const handleCloseUpdate = () => setOpenUpdate(false)
+  const handleOpenUpdate = (id) => {
+    setIdUpdate(id)
+    setOpenUpdate(true)
+  }
+
   return (
     <Container disableGutters sx={{ overflow: 'hidden' }}>
       <CreateShedule handleClose={handleCloseCreate} open={openCreate} school_id={schoolId} />
+      <UpdateSchedule
+        school_id={schoolId}
+        handleClose={handleCloseUpdate}
+        open={openUpdate}
+        id={idUpdate}
+      />
       <Grid spacing={2} container>
         <Grid size={{ lg: 6, md: 7, sm: 7 }}>
           <Stack
@@ -120,6 +135,20 @@ const Schedules = () => {
           </Stack>
         </Grid>
         <Grid size={{ lg: 6, md: 5, sm: 5 }} textAlign={'right'}>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<FaEdit size={16} />}
+            sx={{
+              textTransform: 'capitalize',
+              borderColor: 'var(--primary)',
+              color: 'var(--primary)',
+              marginRight: '30px'
+            }}
+            onClick={() => handleOpenUpdate(class_id)}
+          >
+            Modifier
+          </Button>
           <Button
             size="small"
             variant="contained"
@@ -173,7 +202,7 @@ const Schedules = () => {
             spacing={2}
             marginTop={1}
             sx={{
-              maxHeight: '500px', // Fixez la hauteur maximale de votre choix
+              maxHeight: '480px', // Fixez la hauteur maximale de votre choix
               overflowY: 'auto', // Active le scroll vertical si le contenu dépasse
               overflowX: 'hidden', // Évite le scroll horizontal parasite
               paddingRight: '8px', // Espace pour ne pas coller à la barre de scroll
@@ -184,7 +213,8 @@ const Schedules = () => {
               '&::-webkit-scrollbar-thumb': {
                 backgroundColor: '#ccc',
                 borderRadius: '10px'
-              }
+              },
+              paddingBottom: '5px'
             }}
           >
             {/* Utilisation de la liste filtrée ici */}
@@ -251,6 +281,7 @@ const Schedules = () => {
                       <TableCell
                         component="th"
                         scope="row"
+                        size="small"
                         sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}
                       >
                         {timeRangeLabel}
